@@ -1,0 +1,17 @@
+import { createSimpleFunctional } from '../../util/helpers';
+import VContainer from './VContainer';
+import VContent from './VContent';
+import VFlex from './VFlex';
+import VLayout from './VLayout';
+const VSpacer = createSimpleFunctional('spacer', 'div', 'v-spacer');
+export { VContainer, VContent, VFlex, VLayout, VSpacer };
+export default {
+    $_vuetify_subcomponents: {
+        VContainer,
+        VContent,
+        VFlex,
+        VLayout,
+        VSpacer
+    }
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvY29tcG9uZW50cy9WR3JpZC9pbmRleC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQ0wsc0JBQXNCLEVBQ3ZCLE1BQU0sb0JBQW9CLENBQUE7QUFDM0IsT0FBTyxVQUFVLE1BQU0sY0FBYyxDQUFBO0FBQ3JDLE9BQU8sUUFBUSxNQUFNLFlBQVksQ0FBQTtBQUNqQyxPQUFPLEtBQUssTUFBTSxTQUFTLENBQUE7QUFDM0IsT0FBTyxPQUFPLE1BQU0sV0FBVyxDQUFBO0FBRS9CLE1BQU0sT0FBTyxHQUFHLHNCQUFzQixDQUFDLFFBQVEsRUFBRSxLQUFLLEVBQUUsVUFBVSxDQUFDLENBQUE7QUFFbkUsT0FBTyxFQUNMLFVBQVUsRUFDVixRQUFRLEVBQ1IsS0FBSyxFQUNMLE9BQU8sRUFDUCxPQUFPLEVBQ1IsQ0FBQTtBQUVELGVBQWU7SUFDYix1QkFBdUIsRUFBRTtRQUN2QixVQUFVO1FBQ1YsUUFBUTtRQUNSLEtBQUs7UUFDTCxPQUFPO1FBQ1AsT0FBTztLQUNSO0NBQ0YsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7XHJcbiAgY3JlYXRlU2ltcGxlRnVuY3Rpb25hbFxyXG59IGZyb20gJy4uLy4uL3V0aWwvaGVscGVycydcclxuaW1wb3J0IFZDb250YWluZXIgZnJvbSAnLi9WQ29udGFpbmVyJ1xyXG5pbXBvcnQgVkNvbnRlbnQgZnJvbSAnLi9WQ29udGVudCdcclxuaW1wb3J0IFZGbGV4IGZyb20gJy4vVkZsZXgnXHJcbmltcG9ydCBWTGF5b3V0IGZyb20gJy4vVkxheW91dCdcclxuXHJcbmNvbnN0IFZTcGFjZXIgPSBjcmVhdGVTaW1wbGVGdW5jdGlvbmFsKCdzcGFjZXInLCAnZGl2JywgJ3Ytc3BhY2VyJylcclxuXHJcbmV4cG9ydCB7XHJcbiAgVkNvbnRhaW5lcixcclxuICBWQ29udGVudCxcclxuICBWRmxleCxcclxuICBWTGF5b3V0LFxyXG4gIFZTcGFjZXJcclxufVxyXG5cclxuZXhwb3J0IGRlZmF1bHQge1xyXG4gICRfdnVldGlmeV9zdWJjb21wb25lbnRzOiB7XHJcbiAgICBWQ29udGFpbmVyLFxyXG4gICAgVkNvbnRlbnQsXHJcbiAgICBWRmxleCxcclxuICAgIFZMYXlvdXQsXHJcbiAgICBWU3BhY2VyXHJcbiAgfVxyXG59XHJcbiJdfQ==

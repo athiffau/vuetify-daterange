@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VBottomNav/index.ts"],"names":[],"mappings":"AAAA,OAAO,UAAP,MAAuB,cAAvB;AAEA,SAAS,UAAT;AACA,eAAe,UAAf","sourcesContent":["import VBottomNav from './VBottomNav'\r\n\r\nexport { VBottomNav }\r\nexport default VBottomNav\r\n"],"sourceRoot":""}

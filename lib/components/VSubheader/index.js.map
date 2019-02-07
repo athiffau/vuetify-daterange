@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VSubheader/index.ts"],"names":[],"mappings":"AAAA,OAAO,UAAP,MAAuB,cAAvB;AAEA,SAAS,UAAT;AACA,eAAe,UAAf","sourcesContent":["import VSubheader from './VSubheader'\r\n\r\nexport { VSubheader }\r\nexport default VSubheader\r\n"],"sourceRoot":""}

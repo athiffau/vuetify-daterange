@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VBottomNav/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;QAES,U,GAAA,oB;kBACM,oB","sourcesContent":["import VBottomNav from './VBottomNav'\r\n\r\nexport { VBottomNav }\r\nexport default VBottomNav\r\n"],"sourceRoot":""}

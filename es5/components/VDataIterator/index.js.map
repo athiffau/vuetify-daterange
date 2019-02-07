@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VDataIterator/index.js"],"names":[],"mappings":";;;;;;;;;;;;;QAES,a,GAAA,uB;kBACM,uB","sourcesContent":["import VDataIterator from './VDataIterator'\r\n\r\nexport { VDataIterator }\r\nexport default VDataIterator\r\n"],"sourceRoot":""}

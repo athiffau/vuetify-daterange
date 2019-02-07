@@ -1,0 +1,19 @@
+/**
+ * Removes duplicate `@input` listeners when
+ * using v-model with functional components
+ *
+ * @see https://github.com/vuetifyjs/vuetify/issues/4460
+ */
+export default function dedupeModelListeners(data) {
+    if (data.model && data.on && data.on.input) {
+        if (Array.isArray(data.on.input)) {
+            const i = data.on.input.indexOf(data.model.callback);
+            if (i > -1)
+                data.on.input.splice(i, 1);
+        }
+        else {
+            delete data.on.input;
+        }
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGVkdXBlTW9kZWxMaXN0ZW5lcnMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvdXRpbC9kZWR1cGVNb2RlbExpc3RlbmVycy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTs7Ozs7R0FLRztBQUNILE1BQU0sQ0FBQyxPQUFPLFVBQVUsb0JBQW9CLENBQUUsSUFBZTtJQUMzRCxJQUFJLElBQUksQ0FBQyxLQUFLLElBQUksSUFBSSxDQUFDLEVBQUUsSUFBSSxJQUFJLENBQUMsRUFBRSxDQUFDLEtBQUssRUFBRTtRQUMxQyxJQUFJLEtBQUssQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FBQyxLQUFLLENBQUMsRUFBRTtZQUNoQyxNQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEtBQUssQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxRQUFRLENBQUMsQ0FBQTtZQUNwRCxJQUFJLENBQUMsR0FBRyxDQUFDLENBQUM7Z0JBQUUsSUFBSSxDQUFDLEVBQUUsQ0FBQyxLQUFLLENBQUMsTUFBTSxDQUFDLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQTtTQUN2QzthQUFNO1lBQ0wsT0FBTyxJQUFJLENBQUMsRUFBRSxDQUFDLEtBQUssQ0FBQTtTQUNyQjtLQUNGO0FBQ0gsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFZOb2RlRGF0YSB9IGZyb20gJ3Z1ZSdcclxuXHJcbi8qKlxyXG4gKiBSZW1vdmVzIGR1cGxpY2F0ZSBgQGlucHV0YCBsaXN0ZW5lcnMgd2hlblxyXG4gKiB1c2luZyB2LW1vZGVsIHdpdGggZnVuY3Rpb25hbCBjb21wb25lbnRzXHJcbiAqXHJcbiAqIEBzZWUgaHR0cHM6Ly9naXRodWIuY29tL3Z1ZXRpZnlqcy92dWV0aWZ5L2lzc3Vlcy80NDYwXHJcbiAqL1xyXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBkZWR1cGVNb2RlbExpc3RlbmVycyAoZGF0YTogVk5vZGVEYXRhKTogdm9pZCB7XHJcbiAgaWYgKGRhdGEubW9kZWwgJiYgZGF0YS5vbiAmJiBkYXRhLm9uLmlucHV0KSB7XHJcbiAgICBpZiAoQXJyYXkuaXNBcnJheShkYXRhLm9uLmlucHV0KSkge1xyXG4gICAgICBjb25zdCBpID0gZGF0YS5vbi5pbnB1dC5pbmRleE9mKGRhdGEubW9kZWwuY2FsbGJhY2spXHJcbiAgICAgIGlmIChpID4gLTEpIGRhdGEub24uaW5wdXQuc3BsaWNlKGksIDEpXHJcbiAgICB9IGVsc2Uge1xyXG4gICAgICBkZWxldGUgZGF0YS5vbi5pbnB1dFxyXG4gICAgfVxyXG4gIH1cclxufVxyXG4iXX0=

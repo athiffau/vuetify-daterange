@@ -1,0 +1,45 @@
+import Vue from 'vue';
+/**
+ * Delayable
+ *
+ * @mixin
+ *
+ * Changes the open or close delay time for elements
+ */
+export default Vue.extend().extend({
+    name: 'delayable',
+    props: {
+        openDelay: {
+            type: [Number, String],
+            default: 0
+        },
+        closeDelay: {
+            type: [Number, String],
+            default: 0
+        }
+    },
+    data: () => ({
+        openTimeout: undefined,
+        closeTimeout: undefined
+    }),
+    methods: {
+        /**
+         * Clear any pending delay timers from executing
+         */
+        clearDelay() {
+            clearTimeout(this.openTimeout);
+            clearTimeout(this.closeTimeout);
+        },
+        /**
+         * Runs callback after a specified delay
+         */
+        runDelay(type, cb) {
+            this.clearDelay();
+            const delay = parseInt(this[`${type}Delay`], 10);
+            this[`${type}Timeout`] = setTimeout(cb || (() => {
+                this.isActive = { open: true, close: false }[type];
+            }), delay);
+        }
+    }
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGVsYXlhYmxlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL21peGlucy9kZWxheWFibGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxHQUFHLE1BQU0sS0FBSyxDQUFBO0FBRXJCOzs7Ozs7R0FNRztBQUNILGVBQWUsR0FBRyxDQUFDLE1BQU0sRUFBZ0MsQ0FBQyxNQUFNLENBQUM7SUFDL0QsSUFBSSxFQUFFLFdBQVc7SUFFakIsS0FBSyxFQUFFO1FBQ0wsU0FBUyxFQUFFO1lBQ1QsSUFBSSxFQUFFLENBQUMsTUFBTSxFQUFFLE1BQU0sQ0FBQztZQUN0QixPQUFPLEVBQUUsQ0FBQztTQUNYO1FBQ0QsVUFBVSxFQUFFO1lBQ1YsSUFBSSxFQUFFLENBQUMsTUFBTSxFQUFFLE1BQU0sQ0FBQztZQUN0QixPQUFPLEVBQUUsQ0FBQztTQUNYO0tBQ0Y7SUFFRCxJQUFJLEVBQUUsR0FBRyxFQUFFLENBQUMsQ0FBQztRQUNYLFdBQVcsRUFBRSxTQUErQjtRQUM1QyxZQUFZLEVBQUUsU0FBK0I7S0FDOUMsQ0FBQztJQUVGLE9BQU8sRUFBRTtRQUNQOztXQUVHO1FBQ0gsVUFBVTtZQUNSLFlBQVksQ0FBQyxJQUFJLENBQUMsV0FBVyxDQUFDLENBQUE7WUFDOUIsWUFBWSxDQUFDLElBQUksQ0FBQyxZQUFZLENBQUMsQ0FBQTtRQUNqQyxDQUFDO1FBQ0Q7O1dBRUc7UUFDSCxRQUFRLENBQUUsSUFBc0IsRUFBRSxFQUFlO1lBQy9DLElBQUksQ0FBQyxVQUFVLEVBQUUsQ0FBQTtZQUVqQixNQUFNLEtBQUssR0FBRyxRQUFRLENBQUUsSUFBWSxDQUFDLEdBQUcsSUFBSSxPQUFPLENBQUMsRUFBRSxFQUFFLENBQUMsQ0FFeEQ7WUFBQyxJQUFZLENBQUMsR0FBRyxJQUFJLFNBQVMsQ0FBQyxHQUFHLFVBQVUsQ0FBQyxFQUFFLElBQUksQ0FBQyxHQUFHLEVBQUU7Z0JBQ3hELElBQUksQ0FBQyxRQUFRLEdBQUcsRUFBRSxJQUFJLEVBQUUsSUFBSSxFQUFFLEtBQUssRUFBRSxLQUFLLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQTtZQUNwRCxDQUFDLENBQUMsRUFBRSxLQUFLLENBQUMsQ0FBQTtRQUNaLENBQUM7S0FDRjtDQUNGLENBQUMsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBWdWUgZnJvbSAndnVlJ1xyXG5cclxuLyoqXHJcbiAqIERlbGF5YWJsZVxyXG4gKlxyXG4gKiBAbWl4aW5cclxuICpcclxuICogQ2hhbmdlcyB0aGUgb3BlbiBvciBjbG9zZSBkZWxheSB0aW1lIGZvciBlbGVtZW50c1xyXG4gKi9cclxuZXhwb3J0IGRlZmF1bHQgVnVlLmV4dGVuZDxWdWUgJiB7IGlzQWN0aXZlPzogYm9vbGVhbiB9PigpLmV4dGVuZCh7XHJcbiAgbmFtZTogJ2RlbGF5YWJsZScsXHJcblxyXG4gIHByb3BzOiB7XHJcbiAgICBvcGVuRGVsYXk6IHtcclxuICAgICAgdHlwZTogW051bWJlciwgU3RyaW5nXSxcclxuICAgICAgZGVmYXVsdDogMFxyXG4gICAgfSxcclxuICAgIGNsb3NlRGVsYXk6IHtcclxuICAgICAgdHlwZTogW051bWJlciwgU3RyaW5nXSxcclxuICAgICAgZGVmYXVsdDogMFxyXG4gICAgfVxyXG4gIH0sXHJcblxyXG4gIGRhdGE6ICgpID0+ICh7XHJcbiAgICBvcGVuVGltZW91dDogdW5kZWZpbmVkIGFzIG51bWJlciB8IHVuZGVmaW5lZCxcclxuICAgIGNsb3NlVGltZW91dDogdW5kZWZpbmVkIGFzIG51bWJlciB8IHVuZGVmaW5lZFxyXG4gIH0pLFxyXG5cclxuICBtZXRob2RzOiB7XHJcbiAgICAvKipcclxuICAgICAqIENsZWFyIGFueSBwZW5kaW5nIGRlbGF5IHRpbWVycyBmcm9tIGV4ZWN1dGluZ1xyXG4gICAgICovXHJcbiAgICBjbGVhckRlbGF5ICgpOiB2b2lkIHtcclxuICAgICAgY2xlYXJUaW1lb3V0KHRoaXMub3BlblRpbWVvdXQpXHJcbiAgICAgIGNsZWFyVGltZW91dCh0aGlzLmNsb3NlVGltZW91dClcclxuICAgIH0sXHJcbiAgICAvKipcclxuICAgICAqIFJ1bnMgY2FsbGJhY2sgYWZ0ZXIgYSBzcGVjaWZpZWQgZGVsYXlcclxuICAgICAqL1xyXG4gICAgcnVuRGVsYXkgKHR5cGU6ICdvcGVuJyB8ICdjbG9zZScsIGNiPzogKCkgPT4gdm9pZCk6IHZvaWQge1xyXG4gICAgICB0aGlzLmNsZWFyRGVsYXkoKVxyXG5cclxuICAgICAgY29uc3QgZGVsYXkgPSBwYXJzZUludCgodGhpcyBhcyBhbnkpW2Ake3R5cGV9RGVsYXlgXSwgMTApXHJcblxyXG4gICAgICA7KHRoaXMgYXMgYW55KVtgJHt0eXBlfVRpbWVvdXRgXSA9IHNldFRpbWVvdXQoY2IgfHwgKCgpID0+IHtcclxuICAgICAgICB0aGlzLmlzQWN0aXZlID0geyBvcGVuOiB0cnVlLCBjbG9zZTogZmFsc2UgfVt0eXBlXVxyXG4gICAgICB9KSwgZGVsYXkpXHJcbiAgICB9XHJcbiAgfVxyXG59KVxyXG4iXX0=

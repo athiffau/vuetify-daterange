@@ -1,0 +1,10 @@
+import VRadioGroup from './VRadioGroup';
+import VRadio from './VRadio';
+export { VRadioGroup, VRadio };
+export default {
+    $_vuetify_subcomponents: {
+        VRadioGroup,
+        VRadio
+    }
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvY29tcG9uZW50cy9WUmFkaW9Hcm91cC9pbmRleC5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLFdBQVcsTUFBTSxlQUFlLENBQUE7QUFDdkMsT0FBTyxNQUFNLE1BQU0sVUFBVSxDQUFBO0FBRTdCLE9BQU8sRUFBRSxXQUFXLEVBQUUsTUFBTSxFQUFFLENBQUE7QUFFOUIsZUFBZTtJQUNiLHVCQUF1QixFQUFFO1FBQ3ZCLFdBQVc7UUFDWCxNQUFNO0tBQ1A7Q0FDRixDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFZSYWRpb0dyb3VwIGZyb20gJy4vVlJhZGlvR3JvdXAnXHJcbmltcG9ydCBWUmFkaW8gZnJvbSAnLi9WUmFkaW8nXHJcblxyXG5leHBvcnQgeyBWUmFkaW9Hcm91cCwgVlJhZGlvIH1cclxuXHJcbmV4cG9ydCBkZWZhdWx0IHtcclxuICAkX3Z1ZXRpZnlfc3ViY29tcG9uZW50czoge1xyXG4gICAgVlJhZGlvR3JvdXAsXHJcbiAgICBWUmFkaW9cclxuICB9XHJcbn1cclxuIl19

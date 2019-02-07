@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VFooter/index.js"],"names":[],"mappings":";;;;;;;;;;;;;QAES,O,GAAA,iB;kBACM,iB","sourcesContent":["import VFooter from './VFooter'\r\n\r\nexport { VFooter }\r\nexport default VFooter\r\n"],"sourceRoot":""}

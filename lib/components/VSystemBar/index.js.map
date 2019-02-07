@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VSystemBar/index.ts"],"names":[],"mappings":"AAAA,OAAO,UAAP,MAAuB,cAAvB;AAEA,SAAS,UAAT;AACA,eAAe,UAAf","sourcesContent":["import VSystemBar from './VSystemBar'\r\n\r\nexport { VSystemBar }\r\nexport default VSystemBar\r\n"],"sourceRoot":""}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VChip/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;QAES,K,GAAA,e;kBACM,e","sourcesContent":["import VChip from './VChip'\r\n\r\nexport { VChip }\r\nexport default VChip\r\n"],"sourceRoot":""}

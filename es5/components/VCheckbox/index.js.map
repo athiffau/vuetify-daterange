@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VCheckbox/index.js"],"names":[],"mappings":";;;;;;;;;;;;;QAES,S,GAAA,mB;kBACM,mB","sourcesContent":["import VCheckbox from './VCheckbox'\r\n\r\nexport { VCheckbox }\r\nexport default VCheckbox\r\n"],"sourceRoot":""}

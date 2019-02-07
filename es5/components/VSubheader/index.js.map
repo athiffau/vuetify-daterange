@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VSubheader/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;QAES,U,GAAA,oB;kBACM,oB","sourcesContent":["import VSubheader from './VSubheader'\r\n\r\nexport { VSubheader }\r\nexport default VSubheader\r\n"],"sourceRoot":""}

@@ -1,0 +1,12 @@
+import Vue from 'vue';
+import { deepEqual } from '../util/helpers';
+export default Vue.extend({
+    name: 'comparable',
+    props: {
+        valueComparator: {
+            type: Function,
+            default: deepEqual
+        }
+    }
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29tcGFyYWJsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9taXhpbnMvY29tcGFyYWJsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEdBQUcsTUFBTSxLQUFLLENBQUE7QUFFckIsT0FBTyxFQUFFLFNBQVMsRUFBRSxNQUFNLGlCQUFpQixDQUFBO0FBRTNDLGVBQWUsR0FBRyxDQUFDLE1BQU0sQ0FBQztJQUN4QixJQUFJLEVBQUUsWUFBWTtJQUNsQixLQUFLLEVBQUU7UUFDTCxlQUFlLEVBQUU7WUFDZixJQUFJLEVBQUUsUUFBUTtZQUNkLE9BQU8sRUFBRSxTQUFTO1NBQ3VCO0tBQzVDO0NBQ0YsQ0FBQyxDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFZ1ZSBmcm9tICd2dWUnXHJcbmltcG9ydCB7IFByb3BWYWxpZGF0b3IgfSBmcm9tICd2dWUvdHlwZXMvb3B0aW9ucydcclxuaW1wb3J0IHsgZGVlcEVxdWFsIH0gZnJvbSAnLi4vdXRpbC9oZWxwZXJzJ1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgVnVlLmV4dGVuZCh7XHJcbiAgbmFtZTogJ2NvbXBhcmFibGUnLFxyXG4gIHByb3BzOiB7XHJcbiAgICB2YWx1ZUNvbXBhcmF0b3I6IHtcclxuICAgICAgdHlwZTogRnVuY3Rpb24sXHJcbiAgICAgIGRlZmF1bHQ6IGRlZXBFcXVhbFxyXG4gICAgfSBhcyBhbnkgYXMgUHJvcFZhbGlkYXRvcjx0eXBlb2YgZGVlcEVxdWFsPlxyXG4gIH1cclxufSlcclxuIl19

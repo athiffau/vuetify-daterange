@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VIcon/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;QAES,K,GAAA,e;kBACM,e","sourcesContent":["import VIcon from './VIcon'\r\n\r\nexport { VIcon }\r\nexport default VIcon\r\n"],"sourceRoot":""}

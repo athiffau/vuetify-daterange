@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/VBadge/index.ts"],"names":[],"mappings":"AAAA,OAAO,MAAP,MAAmB,UAAnB;AAEA,SAAS,MAAT;AACA,eAAe,MAAf","sourcesContent":["import VBadge from './VBadge'\r\n\r\nexport { VBadge }\r\nexport default VBadge\r\n"],"sourceRoot":""}
