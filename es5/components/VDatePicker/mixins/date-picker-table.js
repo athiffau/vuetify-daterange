@@ -61,14 +61,24 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
                 return 'warning';
             }
         },
+        hover: {
+            type: String,
+            default: ''
+        },
+        hoverLink: {
+            type: String,
+            default: ''
+        },
         locale: {
             type: String,
             default: 'en-us'
         },
         min: String,
         max: String,
+        range: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
+        transitions: Boolean,
         tableDate: {
             type: String,
             required: true
@@ -77,12 +87,13 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
     },
     data: function data() {
         return {
-            isReversing: false
+            isReversing: false,
+            hovering: ''
         };
     },
     computed: {
         computedTransition: function computedTransition() {
-            return this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition';
+            return this.transitions ? this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition' : 'fade-transition';
         },
         displayedMonth: function displayedMonth() {
             return Number(this.tableDate.split('-')[1]) - 1;
@@ -94,11 +105,18 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
     watch: {
         tableDate: function tableDate(newVal, oldVal) {
             this.isReversing = newVal < oldVal;
+        },
+        hovering: function hovering(value) {
+            this.$emit('hover', value);
         }
     },
     methods: {
-        genButtonClasses: function genButtonClasses(isAllowed, isFloating, isSelected, isCurrent) {
+        genButtonClasses: function genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd) {
             return _extends({
+                'v-btn--range': isRange,
+                'v-btn--range-hover': isRange && isHover,
+                'v-btn--range-start': isRange && isRangeStart,
+                'v-btn--range-end': isRange && isRangeEnd,
                 'v-btn--active': isSelected,
                 'v-btn--flat': !isSelected,
                 'v-btn--icon': isSelected && isAllowed && isFloating,
@@ -119,6 +137,12 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
                 },
                 dblclick: function dblclick() {
                     return _this.$emit('dblclick:' + mouseEventType, value);
+                },
+                mouseover: function mouseover() {
+                    _this.hovering = value;
+                },
+                mouseleave: function mouseleave() {
+                    _this.hovering = '';
                 }
             };
         },
@@ -126,15 +150,22 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             var isAllowed = (0, _isDateAllowed2.default)(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
-            var setColor = isSelected ? this.setBackgroundColor : this.setTextColor;
-            //AT -> Added support for date-range
-            //const color = (isSelected || isCurrent) && (this.color || 'accent')
+            var isHover = value === this.hovering;
+            var isRange = this.range;
+            var isRangeStart = isRange && value === this.value[0];
+            var isRangeEnd = isRange && value === this.value[1];
+            var setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor;
+            //  AT -> Added support for date-range
+            //  const color = (isSelected || isCurrent) && (this.color || 'accent')
             var color = this.getFinalColor(value, (isSelected || isCurrent) && (this.color || 'accent'));
             return this.$createElement('button', setColor(color, {
                 staticClass: 'v-btn',
-                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent),
+                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
                 attrs: {
                     type: 'button'
+                },
+                props: {
+                    isHovering: false
                 },
                 domProps: {
                     disabled: this.disabled || !isAllowed
@@ -145,10 +176,10 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             }, [formatter(value)]), this.genEvents(value)]);
         },
         getFinalColor: function getFinalColor(date, color) {
-            //AT -> Added support for date-range
             var colorInRange = Array.isArray(this.value) && (0, _isDateInRange2.default)(date, this.value);
+            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && (0, _isDateInRange.isHoverAfterStartDate)(date, this.value[0], this.hover ? this.hover : this.hoverLink);
             var colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1]);
-            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : color;
+            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color;
         },
         getEventColors: function getEventColors(date) {
             var arrayize = function arrayize(v) {

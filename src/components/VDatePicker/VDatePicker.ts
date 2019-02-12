@@ -28,6 +28,7 @@ type DatePickerMultipleFormatter = (date: string[]) => string
 interface Formatters {
   year: DatePickerFormatter
   titleDate: DatePickerFormatter | DatePickerMultipleFormatter
+  titleMonthYear: DatePickerFormatter
 }
 
 // Adds leading zero to month/day if necessary, returns 'YYYY' if type = 'year',
@@ -62,6 +63,7 @@ export default mixins(
     },
     // Function formatting the tableDate in the day/month table header
     headerDateFormat: Function as PropValidator<DatePickerFormatter | undefined>,
+    hoverLink: String,
     locale: {
       type: String,
       default: 'en-us'
@@ -80,6 +82,7 @@ export default mixins(
       type: String,
       default: '$vuetify.icons.prev'
     },
+    range: Boolean,
     reactive: Boolean,
     readonly: Boolean,
     scrollable: Boolean,
@@ -90,6 +93,10 @@ export default mixins(
     showWeek: Boolean,
     // Function formatting currently selected date in the picker title
     titleDateFormat: Function as PropValidator<DatePickerFormatter | DatePickerMultipleFormatter | undefined>,
+    transitions: {
+      type: Boolean,
+      default: true
+    },
     type: {
       type: String,
       default: 'date',
@@ -110,6 +117,7 @@ export default mixins(
       inputMonth: null as number | null,
       inputYear: null as number | null,
       isReversing: false,
+      hovering: '',
       now,
       // tableDate is a string in 'YYYY' / 'YYYY-M' format (leading zero for month is not required)
       tableDate: (() => {
@@ -170,7 +178,8 @@ export default mixins(
     formatters (): Formatters {
       return {
         year: this.yearFormat || createNativeLocaleFormatter(this.locale, { year: 'numeric', timeZone: 'UTC' }, { length: 4 }),
-        titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter)
+        titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter),
+        titleMonthYear: this.defaultRangeTitleFormatter
       }
     },
     defaultTitleMultipleDateFormatter (): DatePickerMultipleFormatter {
@@ -197,9 +206,15 @@ export default mixins(
         .replace(', ', ',<br>')
 
       return this.landscape ? landscapeFormatter : titleDateFormatter
+    },
+    defaultRangeTitleFormatter (): DatePickerFormatter {
+      const titleRangeFormatter = createNativeLocaleFormatter(this.locale, { month: 'short', day: 'numeric', timeZone: 'UTC' }, {
+        start: 0,
+        length: 6
+      })
+      return titleRangeFormatter
     }
   },
-
   watch: {
     tableDate (val: string, prev: string) {
       // Make a ISO 8601 strings from val and prev for comparision, otherwise it will incorrectly
@@ -212,6 +227,7 @@ export default mixins(
       if (val) {
         this.tableDate = val
       } else if (this.lastValue && this.type === 'date') {
+        console.log(`Replace date with ${this.lastValue}`)
         this.tableDate = sanitizeDateString(this.lastValue, 'month')
       } else if (this.lastValue && this.type === 'month') {
         this.tableDate = sanitizeDateString(this.lastValue, 'year')
@@ -224,6 +240,7 @@ export default mixins(
       if (!this.multiple && this.value && !this.pickerDate) {
         this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month')
       } else if (this.multiple && (this.value as string[]).length && !(oldValue as string[]).length && !this.pickerDate) {
+        console.log(`Replacing tableDate with ${this.inputDate}`)
         this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month')
       }
     },
@@ -236,6 +253,9 @@ export default mixins(
           .filter(this.isDateAllowed)
         this.$emit('input', this.multiple ? output : output[0])
       }
+    },
+    hovering (value: String, prev: string) {
+      this.$emit('hoverLink', value)
     }
   },
 
@@ -310,6 +330,7 @@ export default mixins(
           disabled: this.disabled,
           readonly: this.readonly,
           selectingYear: this.activePicker === 'YEAR',
+          transitions: this.transitions,
           year: this.formatters.year(this.value ? `${this.inputYear}` : this.tableDate),
           yearIcon: this.yearIcon,
           value: this.multiple ? (this.value as string[])[0] : this.value
@@ -334,6 +355,7 @@ export default mixins(
           max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
           prevIcon: this.prevIcon,
           readonly: this.readonly,
+          transitions: this.transitions,
           value: this.activePicker === 'DATE' ? `${pad(this.tableYear, 4)}-${pad(this.tableMonth + 1)}` : `${pad(this.tableYear, 4)}`
         },
         on: {
@@ -354,14 +376,18 @@ export default mixins(
           eventColor: this.eventColor,
           firstDayOfWeek: this.firstDayOfWeek,
           format: this.dayFormat,
+          hover: this.hovering,
+          hoverLink: this.hoverLink,
           light: this.light,
           locale: this.locale,
           min: this.min,
           max: this.max,
+          range: this.range,
           readonly: this.readonly,
           scrollable: this.scrollable,
           showWeek: this.showWeek,
           tableDate: `${pad(this.tableYear, 4)}-${pad(this.tableMonth + 1)}`,
+          transitions: this.transitions,
           value: this.value,
           weekdayFormat: this.weekdayFormat
         },
@@ -369,8 +395,10 @@ export default mixins(
         on: {
           input: this.dateClick,
           tableDate: (value: string) => this.tableDate = value,
+          hover: (value: string) => this.hovering = value,
           'click:date': (value: string) => this.$emit('click:date', value),
-          'dblclick:date': (value: string) => this.$emit('dblclick:date', value)
+          'dblclick:date': (value: string) => this.$emit('dblclick:date', value),
+          'hoverLink': (value: string) => this.$emit('hoverLink', value)
         }
       })
     },

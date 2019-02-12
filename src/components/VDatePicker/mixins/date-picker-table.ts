@@ -9,7 +9,7 @@ import Themeable from '../../../mixins/themeable'
 
 // Utils
 import isDateAllowed, { AllowedDateFunction } from '../util/isDateAllowed'
-import isDateInRange from '../util/isDateInRange'
+import isDateInRange, { isHoverAfterStartDate } from '../util/isDateInRange'
 import mixins from '../../../util/mixins'
 
 // Types
@@ -17,6 +17,7 @@ import { VNodeChildren } from 'vue'
 import { PropValidator } from 'vue/types/options'
 import { DatePickerFormatter } from '../util/createNativeLocaleFormatter'
 import { DateEvents, DateEventColors, DateEventColorValue } from '../VDatePicker'
+// import { emit } from 'cluster';
 
 type CalculateTableDateFunction = (v: number) => string
 
@@ -40,14 +41,24 @@ export default mixins(
       type: [Array, Function, Object, String],
       default: () => 'warning'
     } as any as PropValidator<DateEventColors>,
+    hover: {
+      type: String,
+      default: ''
+    },
+    hoverLink: {
+      type: String,
+      default: ''
+    },
     locale: {
       type: String,
       default: 'en-us'
     },
     min: String,
     max: String,
+    range: Boolean,
     readonly: Boolean,
     scrollable: Boolean,
+    transitions: Boolean,
     tableDate: {
       type: String,
       required: true
@@ -56,12 +67,17 @@ export default mixins(
   },
 
   data: () => ({
-    isReversing: false
+    isReversing: false,
+    hovering: ''
   }),
 
   computed: {
     computedTransition (): string {
-      return (this.isReversing === !this.$vuetify.rtl) ? 'tab-reverse-transition' : 'tab-transition'
+      return this.transitions 
+        ? (this.isReversing === !this.$vuetify.rtl) 
+          ? 'tab-reverse-transition' 
+          : 'tab-transition'
+        : 'fade-transition'
     },
     displayedMonth (): number {
       return Number(this.tableDate.split('-')[1]) - 1
@@ -74,12 +90,28 @@ export default mixins(
   watch: {
     tableDate (newVal: string, oldVal: string) {
       this.isReversing = newVal < oldVal
+    },
+    hovering (value) {
+      this.$emit('hover', value)
     }
   },
 
   methods: {
-    genButtonClasses (isAllowed: boolean, isFloating: boolean, isSelected: boolean, isCurrent: boolean) {
+    genButtonClasses (
+      isAllowed: boolean,
+      isFloating: boolean,
+      isSelected: boolean,
+      isCurrent: boolean,
+      isRange: boolean,
+      isHover: boolean,
+      isRangeStart: boolean,
+      isRangeEnd: boolean
+    ) {
       return {
+        'v-btn--range': isRange,
+        'v-btn--range-hover': isRange && isHover,
+        'v-btn--range-start': isRange && isRangeStart,
+        'v-btn--range-end': isRange && isRangeEnd,
         'v-btn--active': isSelected,
         'v-btn--flat': !isSelected,
         'v-btn--icon': isSelected && isAllowed && isFloating,
@@ -98,14 +130,24 @@ export default mixins(
           isAllowed && !this.readonly && this.$emit('input', value)
           this.$emit(`click:${mouseEventType}`, value)
         },
-        dblclick: () => this.$emit(`dblclick:${mouseEventType}`, value)
+        dblclick: () => this.$emit(`dblclick:${mouseEventType}`, value),
+        mouseover: () => {
+          this.hovering = value
+        },
+        mouseleave: () => {
+          this.hovering = ''
+        }
       }
     },
     genButton (value: string, isFloating: boolean, mouseEventType: string, formatter: DatePickerFormatter) {
       const isAllowed = isDateAllowed(value, this.min, this.max, this.allowedDates)
       const isSelected = value === this.value || (Array.isArray(this.value) && this.value.indexOf(value) !== -1)
       const isCurrent = value === this.current
-      const setColor = isSelected ? this.setBackgroundColor : this.setTextColor
+      const isHover = value === this.hovering
+      const isRange = this.range
+      const isRangeStart = isRange && value === this.value[0]
+      const isRangeEnd = isRange && value === this.value[1]
+      const setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor
 
       //  AT -> Added support for date-range
       //  const color = (isSelected || isCurrent) && (this.color || 'accent')
@@ -113,9 +155,12 @@ export default mixins(
 
       return this.$createElement('button', setColor(color, {
         staticClass: 'v-btn',
-        'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent),
+        'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
         attrs: {
           type: 'button'
+        },
+        props: {
+          isHovering: false
         },
         domProps: {
           disabled: this.disabled || !isAllowed
@@ -129,10 +174,10 @@ export default mixins(
       ])
     },
     getFinalColor (date: string, color: string | false) {
-      //  AT -> Added support for date-range
       const colorInRange = Array.isArray(this.value) && isDateInRange(date, this.value)
+      const colorInRangeHover = Array.isArray(this.value) && (this.value.length === 1) && (typeof this.value[0] === 'string') && isHoverAfterStartDate(date, this.value[0], this.hover ? this.hover : this.hoverLink)
       const colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1])
-      return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : color
+      return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color
     },
     getEventColors (date: string) {
       const arrayize = (v: string | string[]) => Array.isArray(v) ? v : [v]

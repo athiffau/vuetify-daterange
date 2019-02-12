@@ -4878,6 +4878,7 @@ function sanitizeDateString(dateString, type) {
         },
         // Function formatting the tableDate in the day/month table header
         headerDateFormat: Function,
+        hoverLink: String,
         locale: {
             type: String,
             default: 'en-us'
@@ -4896,6 +4897,7 @@ function sanitizeDateString(dateString, type) {
             type: String,
             default: '$vuetify.icons.prev'
         },
+        range: Boolean,
         reactive: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
@@ -4906,6 +4908,10 @@ function sanitizeDateString(dateString, type) {
         showWeek: Boolean,
         // Function formatting currently selected date in the picker title
         titleDateFormat: Function,
+        transitions: {
+            type: Boolean,
+            default: true
+        },
         type: {
             type: String,
             default: 'date',
@@ -4928,6 +4934,7 @@ function sanitizeDateString(dateString, type) {
             inputMonth: null,
             inputYear: null,
             isReversing: false,
+            hovering: '',
             now: now,
             // tableDate is a string in 'YYYY' / 'YYYY-M' format (leading zero for month is not required)
             tableDate: function () {
@@ -4984,7 +4991,8 @@ function sanitizeDateString(dateString, type) {
         formatters: function formatters() {
             return {
                 year: this.yearFormat || Object(_util__WEBPACK_IMPORTED_MODULE_6__["createNativeLocaleFormatter"])(this.locale, { year: 'numeric', timeZone: 'UTC' }, { length: 4 }),
-                titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter)
+                titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter),
+                titleMonthYear: this.defaultRangeTitleFormatter
             };
         },
         defaultTitleMultipleDateFormatter: function defaultTitleMultipleDateFormatter() {
@@ -5014,6 +5022,13 @@ function sanitizeDateString(dateString, type) {
                 }).replace(', ', ',<br>');
             };
             return this.landscape ? landscapeFormatter : titleDateFormatter;
+        },
+        defaultRangeTitleFormatter: function defaultRangeTitleFormatter() {
+            var titleRangeFormatter = Object(_util__WEBPACK_IMPORTED_MODULE_6__["createNativeLocaleFormatter"])(this.locale, { month: 'short', day: 'numeric', timeZone: 'UTC' }, {
+                start: 0,
+                length: 6
+            });
+            return titleRangeFormatter;
         }
     },
     watch: {
@@ -5028,6 +5043,7 @@ function sanitizeDateString(dateString, type) {
             if (val) {
                 this.tableDate = val;
             } else if (this.lastValue && this.type === 'date') {
+                console.log("Replace date with " + this.lastValue);
                 this.tableDate = sanitizeDateString(this.lastValue, 'month');
             } else if (this.lastValue && this.type === 'month') {
                 this.tableDate = sanitizeDateString(this.lastValue, 'year');
@@ -5039,6 +5055,7 @@ function sanitizeDateString(dateString, type) {
             if (!this.multiple && this.value && !this.pickerDate) {
                 this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month');
             } else if (this.multiple && this.value.length && !oldValue.length && !this.pickerDate) {
+                console.log("Replacing tableDate with " + this.inputDate);
                 this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month');
             }
         },
@@ -5050,6 +5067,9 @@ function sanitizeDateString(dateString, type) {
                 }).filter(this.isDateAllowed);
                 this.$emit('input', this.multiple ? output : output[0]);
             }
+        },
+        hovering: function hovering(value, prev) {
+            this.$emit('hoverLink', value);
         }
     },
     created: function created() {
@@ -5117,6 +5137,7 @@ function sanitizeDateString(dateString, type) {
                     disabled: this.disabled,
                     readonly: this.readonly,
                     selectingYear: this.activePicker === 'YEAR',
+                    transitions: this.transitions,
                     year: this.formatters.year(this.value ? "" + this.inputYear : this.tableDate),
                     yearIcon: this.yearIcon,
                     value: this.multiple ? this.value[0] : this.value
@@ -5144,6 +5165,7 @@ function sanitizeDateString(dateString, type) {
                     max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
                     prevIcon: this.prevIcon,
                     readonly: this.readonly,
+                    transitions: this.transitions,
                     value: this.activePicker === 'DATE' ? Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1) : "" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4)
                 },
                 on: {
@@ -5169,14 +5191,18 @@ function sanitizeDateString(dateString, type) {
                     eventColor: this.eventColor,
                     firstDayOfWeek: this.firstDayOfWeek,
                     format: this.dayFormat,
+                    hover: this.hovering,
+                    hoverLink: this.hoverLink,
                     light: this.light,
                     locale: this.locale,
                     min: this.min,
                     max: this.max,
+                    range: this.range,
                     readonly: this.readonly,
                     scrollable: this.scrollable,
                     showWeek: this.showWeek,
                     tableDate: Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1),
+                    transitions: this.transitions,
                     value: this.value,
                     weekdayFormat: this.weekdayFormat
                 },
@@ -5186,11 +5212,17 @@ function sanitizeDateString(dateString, type) {
                     tableDate: function tableDate(value) {
                         return _this.tableDate = value;
                     },
+                    hover: function hover(value) {
+                        return _this.hovering = value;
+                    },
                     'click:date': function clickDate(value) {
                         return _this.$emit('click:date', value);
                     },
                     'dblclick:date': function dblclickDate(value) {
                         return _this.$emit('dblclick:date', value);
+                    },
+                    'hoverLink': function hoverLink(value) {
+                        return _this.$emit('hoverLink', value);
                     }
                 }
             });
@@ -5918,14 +5950,24 @@ var __assign = undefined && undefined.__assign || function () {
                 return 'warning';
             }
         },
+        hover: {
+            type: String,
+            default: ''
+        },
+        hoverLink: {
+            type: String,
+            default: ''
+        },
         locale: {
             type: String,
             default: 'en-us'
         },
         min: String,
         max: String,
+        range: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
+        transitions: Boolean,
         tableDate: {
             type: String,
             required: true
@@ -5934,12 +5976,13 @@ var __assign = undefined && undefined.__assign || function () {
     },
     data: function data() {
         return {
-            isReversing: false
+            isReversing: false,
+            hovering: ''
         };
     },
     computed: {
         computedTransition: function computedTransition() {
-            return this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition';
+            return this.transitions ? this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition' : 'fade-transition';
         },
         displayedMonth: function displayedMonth() {
             return Number(this.tableDate.split('-')[1]) - 1;
@@ -5951,11 +5994,14 @@ var __assign = undefined && undefined.__assign || function () {
     watch: {
         tableDate: function tableDate(newVal, oldVal) {
             this.isReversing = newVal < oldVal;
+        },
+        hovering: function hovering(value) {
+            this.$emit('hover', value);
         }
     },
     methods: {
-        genButtonClasses: function genButtonClasses(isAllowed, isFloating, isSelected, isCurrent) {
-            return __assign({ 'v-btn--active': isSelected, 'v-btn--flat': !isSelected, 'v-btn--icon': isSelected && isAllowed && isFloating, 'v-btn--floating': isFloating, 'v-btn--depressed': !isFloating && isSelected, 'v-btn--disabled': !isAllowed || this.disabled && isSelected, 'v-btn--outline': isCurrent && !isSelected }, this.themeClasses);
+        genButtonClasses: function genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd) {
+            return __assign({ 'v-btn--range': isRange, 'v-btn--range-hover': isRange && isHover, 'v-btn--range-start': isRange && isRangeStart, 'v-btn--range-end': isRange && isRangeEnd, 'v-btn--active': isSelected, 'v-btn--flat': !isSelected, 'v-btn--icon': isSelected && isAllowed && isFloating, 'v-btn--floating': isFloating, 'v-btn--depressed': !isFloating && isSelected, 'v-btn--disabled': !isAllowed || this.disabled && isSelected, 'v-btn--outline': isCurrent && !isSelected }, this.themeClasses);
         },
         genButtonEvents: function genButtonEvents(value, isAllowed, mouseEventType) {
             var _this = this;
@@ -5967,6 +6013,12 @@ var __assign = undefined && undefined.__assign || function () {
                 },
                 dblclick: function dblclick() {
                     return _this.$emit("dblclick:" + mouseEventType, value);
+                },
+                mouseover: function mouseover() {
+                    _this.hovering = value;
+                },
+                mouseleave: function mouseleave() {
+                    _this.hovering = '';
                 }
             };
         },
@@ -5974,15 +6026,22 @@ var __assign = undefined && undefined.__assign || function () {
             var isAllowed = Object(_util_isDateAllowed__WEBPACK_IMPORTED_MODULE_4__["default"])(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
-            var setColor = isSelected ? this.setBackgroundColor : this.setTextColor;
-            //AT -> Added support for date-range
-            //const color = (isSelected || isCurrent) && (this.color || 'accent')
+            var isHover = value === this.hovering;
+            var isRange = this.range;
+            var isRangeStart = isRange && value === this.value[0];
+            var isRangeEnd = isRange && value === this.value[1];
+            var setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor;
+            //  AT -> Added support for date-range
+            //  const color = (isSelected || isCurrent) && (this.color || 'accent')
             var color = this.getFinalColor(value, (isSelected || isCurrent) && (this.color || 'accent'));
             return this.$createElement('button', setColor(color, {
                 staticClass: 'v-btn',
-                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent),
+                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
                 attrs: {
                     type: 'button'
+                },
+                props: {
+                    isHovering: false
                 },
                 domProps: {
                     disabled: this.disabled || !isAllowed
@@ -5993,10 +6052,10 @@ var __assign = undefined && undefined.__assign || function () {
             }, [formatter(value)]), this.genEvents(value)]);
         },
         getFinalColor: function getFinalColor(date, color) {
-            //AT -> Added support for date-range
             var colorInRange = Array.isArray(this.value) && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["default"])(date, this.value);
+            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverAfterStartDate"])(date, this.value[0], this.hover ? this.hover : this.hoverLink);
             var colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1]);
-            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : color;
+            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color;
         },
         getEventColors: function getEventColors(date) {
             var arrayize = function arrayize(v) {
@@ -6182,12 +6241,13 @@ function isDateAllowed(date, min, max, allowedFn) {
 /*!**********************************************************!*\
   !*** ./src/components/VDatePicker/util/isDateInRange.ts ***!
   \**********************************************************/
-/*! exports provided: default */
+/*! exports provided: default, isHoverAfterStartDate */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return isDateInRange; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isHoverAfterStartDate", function() { return isHoverAfterStartDate; });
 function dateFromStr(strDate, deltaDay, deltaMonth, deltaYear) {
     if (deltaDay === void 0) {
         deltaDay = 0;
@@ -6198,25 +6258,35 @@ function dateFromStr(strDate, deltaDay, deltaMonth, deltaYear) {
     if (deltaYear === void 0) {
         deltaYear = 0;
     }
-    var yr = parseInt(strDate.substring(0, 4));
-    var mon = parseInt(strDate.substring(5, 8));
-    var dt = parseInt(strDate.substring(8, 10));
-    var d = new Date(yr, mon - 1, dt);
-    d.setMonth(d.getMonth() + deltaMonth, d.getDate() + deltaDay);
-    d.setFullYear(d.getFullYear() + deltaYear);
-    return d;
+    if (typeof strDate === 'string') {
+        var yr = parseInt(strDate.substring(0, 4));
+        var mon = parseInt(strDate.substring(5, 8));
+        var dt = parseInt(strDate.substring(8, 10));
+        var d = new Date(yr, mon - 1, dt);
+        if (typeof d.setMonth === 'function') {
+            d.setMonth(d.getMonth() + deltaMonth, d.getDate() + deltaDay);
+            d.setFullYear(d.getFullYear() + deltaYear);
+            return d;
+        }
+    }
+    return null;
 }
 function isDateInRange(date, range) {
     var dateToCheck = dateFromStr(date);
     if (Array.isArray(range)) {
-        range.sort();
         if (typeof range[0] === 'string' && typeof range[1] === 'string') {
             var startDate = dateFromStr(range[0]);
             var endDate = dateFromStr(range[1]);
-            return startDate.getTime() <= dateToCheck.getTime() && endDate.getTime() >= dateToCheck.getTime();
+            return startDate && endDate && dateToCheck ? startDate.getTime() <= dateToCheck.getTime() && endDate.getTime() >= dateToCheck.getTime() : false;
         }
     }
     return false;
+}
+function isHoverAfterStartDate(btnDate, startDate, hoveringDate) {
+    var _me = dateFromStr(btnDate);
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd && _me ? _me.getTime() >= _std.getTime() && _me.getTime() <= _htd.getTime() && _std.getTime() < _htd.getTime() : false;
 }
 
 /***/ }),

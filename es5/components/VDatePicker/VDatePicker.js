@@ -89,6 +89,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
         },
         // Function formatting the tableDate in the day/month table header
         headerDateFormat: Function,
+        hoverLink: String,
         locale: {
             type: String,
             default: 'en-us'
@@ -107,6 +108,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             type: String,
             default: '$vuetify.icons.prev'
         },
+        range: Boolean,
         reactive: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
@@ -117,6 +119,10 @@ exports.default = (0, _mixins2.default)(_picker2.default
         showWeek: Boolean,
         // Function formatting currently selected date in the picker title
         titleDateFormat: Function,
+        transitions: {
+            type: Boolean,
+            default: true
+        },
         type: {
             type: String,
             default: 'date',
@@ -140,6 +146,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             inputMonth: null,
             inputYear: null,
             isReversing: false,
+            hovering: '',
             now: now,
             // tableDate is a string in 'YYYY' / 'YYYY-M' format (leading zero for month is not required)
             tableDate: function () {
@@ -197,7 +204,8 @@ exports.default = (0, _mixins2.default)(_picker2.default
         formatters: function formatters() {
             return {
                 year: this.yearFormat || (0, _util.createNativeLocaleFormatter)(this.locale, { year: 'numeric', timeZone: 'UTC' }, { length: 4 }),
-                titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter)
+                titleDate: this.titleDateFormat || (this.multiple ? this.defaultTitleMultipleDateFormatter : this.defaultTitleDateFormatter),
+                titleMonthYear: this.defaultRangeTitleFormatter
             };
         },
         defaultTitleMultipleDateFormatter: function defaultTitleMultipleDateFormatter() {
@@ -228,6 +236,13 @@ exports.default = (0, _mixins2.default)(_picker2.default
                 }).replace(', ', ',<br>');
             };
             return this.landscape ? landscapeFormatter : titleDateFormatter;
+        },
+        defaultRangeTitleFormatter: function defaultRangeTitleFormatter() {
+            var titleRangeFormatter = (0, _util.createNativeLocaleFormatter)(this.locale, { month: 'short', day: 'numeric', timeZone: 'UTC' }, {
+                start: 0,
+                length: 6
+            });
+            return titleRangeFormatter;
         }
     },
     watch: {
@@ -242,6 +257,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             if (val) {
                 this.tableDate = val;
             } else if (this.lastValue && this.type === 'date') {
+                console.log('Replace date with ' + this.lastValue);
                 this.tableDate = sanitizeDateString(this.lastValue, 'month');
             } else if (this.lastValue && this.type === 'month') {
                 this.tableDate = sanitizeDateString(this.lastValue, 'year');
@@ -253,6 +269,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             if (!this.multiple && this.value && !this.pickerDate) {
                 this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month');
             } else if (this.multiple && this.value.length && !oldValue.length && !this.pickerDate) {
+                console.log('Replacing tableDate with ' + this.inputDate);
                 this.tableDate = sanitizeDateString(this.inputDate, this.type === 'month' ? 'year' : 'month');
             }
         },
@@ -264,6 +281,9 @@ exports.default = (0, _mixins2.default)(_picker2.default
                 }).filter(this.isDateAllowed);
                 this.$emit('input', this.multiple ? output : output[0]);
             }
+        },
+        hovering: function hovering(value, prev) {
+            this.$emit('hoverLink', value);
         }
     },
     created: function created() {
@@ -333,6 +353,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     disabled: this.disabled,
                     readonly: this.readonly,
                     selectingYear: this.activePicker === 'YEAR',
+                    transitions: this.transitions,
                     year: this.formatters.year(this.value ? '' + this.inputYear : this.tableDate),
                     yearIcon: this.yearIcon,
                     value: this.multiple ? this.value[0] : this.value
@@ -361,6 +382,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
                     prevIcon: this.prevIcon,
                     readonly: this.readonly,
+                    transitions: this.transitions,
                     value: this.activePicker === 'DATE' ? (0, _util.pad)(this.tableYear, 4) + '-' + (0, _util.pad)(this.tableMonth + 1) : '' + (0, _util.pad)(this.tableYear, 4)
                 },
                 on: {
@@ -387,14 +409,18 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     eventColor: this.eventColor,
                     firstDayOfWeek: this.firstDayOfWeek,
                     format: this.dayFormat,
+                    hover: this.hovering,
+                    hoverLink: this.hoverLink,
                     light: this.light,
                     locale: this.locale,
                     min: this.min,
                     max: this.max,
+                    range: this.range,
                     readonly: this.readonly,
                     scrollable: this.scrollable,
                     showWeek: this.showWeek,
                     tableDate: (0, _util.pad)(this.tableYear, 4) + '-' + (0, _util.pad)(this.tableMonth + 1),
+                    transitions: this.transitions,
                     value: this.value,
                     weekdayFormat: this.weekdayFormat
                 },
@@ -404,11 +430,17 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     tableDate: function tableDate(value) {
                         return _this5.tableDate = value;
                     },
+                    hover: function hover(value) {
+                        return _this5.hovering = value;
+                    },
                     'click:date': function clickDate(value) {
                         return _this5.$emit('click:date', value);
                     },
                     'dblclick:date': function dblclickDate(value) {
                         return _this5.$emit('dblclick:date', value);
+                    },
+                    'hoverLink': function hoverLink(value) {
+                        return _this5.$emit('hoverLink', value);
                     }
                 }
             });
