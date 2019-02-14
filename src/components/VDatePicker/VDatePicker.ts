@@ -45,6 +45,10 @@ export default mixins(
   name: 'v-date-picker',
 
   props: {
+    allowDateChange: {
+      type: Boolean,
+      default: true
+    },
     allowedDates: Function as PropValidator<AllowedDateFunction | undefined>,
     // Function formatting the day in date picker table
     dayFormat: Function as PropValidator<AllowedDateFunction | undefined>,
@@ -93,10 +97,6 @@ export default mixins(
     showWeek: Boolean,
     // Function formatting currently selected date in the picker title
     titleDateFormat: Function as PropValidator<DatePickerFormatter | DatePickerMultipleFormatter | undefined>,
-    transitions: {
-      type: Boolean,
-      default: true
-    },
     type: {
       type: String,
       default: 'date',
@@ -330,7 +330,6 @@ export default mixins(
           disabled: this.disabled,
           readonly: this.readonly,
           selectingYear: this.activePicker === 'YEAR',
-          transitions: this.transitions,
           year: this.formatters.year(this.value ? `${this.inputYear}` : this.tableDate),
           yearIcon: this.yearIcon,
           value: this.multiple ? (this.value as string[])[0] : this.value
@@ -344,6 +343,7 @@ export default mixins(
     genTableHeader () {
       return this.$createElement(VDatePickerHeader, {
         props: {
+          allowDateChange: this.allowDateChange,
           nextIcon: this.nextIcon,
           color: this.color,
           dark: this.dark,
@@ -355,7 +355,6 @@ export default mixins(
           max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
           prevIcon: this.prevIcon,
           readonly: this.readonly,
-          transitions: this.transitions,
           value: this.activePicker === 'DATE' ? `${pad(this.tableYear, 4)}-${pad(this.tableMonth + 1)}` : `${pad(this.tableYear, 4)}`
         },
         on: {
@@ -387,7 +386,6 @@ export default mixins(
           scrollable: this.scrollable,
           showWeek: this.showWeek,
           tableDate: `${pad(this.tableYear, 4)}-${pad(this.tableMonth + 1)}`,
-          transitions: this.transitions,
           value: this.value,
           weekdayFormat: this.weekdayFormat
         },

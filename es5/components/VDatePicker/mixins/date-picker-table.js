@@ -78,7 +78,6 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         range: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
-        transitions: Boolean,
         tableDate: {
             type: String,
             required: true
@@ -93,7 +92,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
     },
     computed: {
         computedTransition: function computedTransition() {
-            return this.transitions ? this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition' : 'fade-transition';
+            return this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition';
         },
         displayedMonth: function displayedMonth() {
             return Number(this.tableDate.split('-')[1]) - 1;

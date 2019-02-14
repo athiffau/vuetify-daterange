@@ -67,6 +67,10 @@ exports.default = (0, _mixins2.default)(_picker2.default
 ).extend({
     name: 'v-date-picker',
     props: {
+        allowDateChange: {
+            type: Boolean,
+            default: true
+        },
         allowedDates: Function,
         // Function formatting the day in date picker table
         dayFormat: Function,
@@ -119,10 +123,6 @@ exports.default = (0, _mixins2.default)(_picker2.default
         showWeek: Boolean,
         // Function formatting currently selected date in the picker title
         titleDateFormat: Function,
-        transitions: {
-            type: Boolean,
-            default: true
-        },
         type: {
             type: String,
             default: 'date',
@@ -353,7 +353,6 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     disabled: this.disabled,
                     readonly: this.readonly,
                     selectingYear: this.activePicker === 'YEAR',
-                    transitions: this.transitions,
                     year: this.formatters.year(this.value ? '' + this.inputYear : this.tableDate),
                     yearIcon: this.yearIcon,
                     value: this.multiple ? this.value[0] : this.value
@@ -371,6 +370,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
 
             return this.$createElement(_VDatePickerHeader2.default, {
                 props: {
+                    allowDateChange: this.allowDateChange,
                     nextIcon: this.nextIcon,
                     color: this.color,
                     dark: this.dark,
@@ -382,7 +382,6 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
                     prevIcon: this.prevIcon,
                     readonly: this.readonly,
-                    transitions: this.transitions,
                     value: this.activePicker === 'DATE' ? (0, _util.pad)(this.tableYear, 4) + '-' + (0, _util.pad)(this.tableMonth + 1) : '' + (0, _util.pad)(this.tableYear, 4)
                 },
                 on: {
@@ -420,7 +419,6 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     scrollable: this.scrollable,
                     showWeek: this.showWeek,
                     tableDate: (0, _util.pad)(this.tableYear, 4) + '-' + (0, _util.pad)(this.tableMonth + 1),
-                    transitions: this.transitions,
                     value: this.value,
                     weekdayFormat: this.weekdayFormat
                 },

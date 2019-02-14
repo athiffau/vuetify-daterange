@@ -45,6 +45,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
 ).extend({
     name: 'v-date-picker-header',
     props: {
+        allowDateChange: Boolean,
         disabled: Boolean,
         format: Function,
         locale: {
@@ -93,7 +94,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         genBtn: function genBtn(change) {
             var _this = this;
 
-            var disabled = this.disabled || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
+            var disabled = this.disabled || !this.allowDateChange || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
             return this.$createElement(_VBtn2.default, {
                 props: {
                     dark: this.dark,
@@ -124,7 +125,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         genHeader: function genHeader() {
             var _this2 = this;
 
-            var color = !this.disabled && (this.color || 'accent');
+            var color = !this.disabled && this.allowDateChange && (this.color || 'accent');
             var header = this.$createElement('div', this.setTextColor(color, {
                 key: String(this.value)
             }), [this.$createElement('button', {
@@ -145,7 +146,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             return this.$createElement('div', {
                 staticClass: 'v-date-picker-header__value',
                 class: {
-                    'v-date-picker-header__value--disabled': this.disabled
+                    'v-date-picker-header__value--disabled': this.disabled || !this.allowDateChange
                 }
             }, [transition]);
         }
@@ -154,7 +155,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         return this.$createElement('div', {
             staticClass: 'v-date-picker-header',
             class: _extends({
-                'v-date-picker-header--disabled': this.disabled
+                'v-date-picker-header--disabled': this.disabled || !this.allowDateChange
             }, this.themeClasses)
         }, [this.genBtn(-1), this.genHeader(), this.genBtn(+1)]);
     }

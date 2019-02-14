@@ -58,7 +58,6 @@ export default mixins(
     range: Boolean,
     readonly: Boolean,
     scrollable: Boolean,
-    transitions: Boolean,
     tableDate: {
       type: String,
       required: true
@@ -73,11 +72,7 @@ export default mixins(
 
   computed: {
     computedTransition (): string {
-      return this.transitions 
-        ? (this.isReversing === !this.$vuetify.rtl) 
-          ? 'tab-reverse-transition' 
-          : 'tab-transition'
-        : 'fade-transition'
+      return (this.isReversing === !this.$vuetify.rtl) ? 'tab-reverse-transition' : 'tab-transition'
     },
     displayedMonth (): number {
       return Number(this.tableDate.split('-')[1]) - 1

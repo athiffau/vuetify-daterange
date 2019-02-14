@@ -4856,6 +4856,10 @@ function sanitizeDateString(dateString, type) {
 ).extend({
     name: 'v-date-picker',
     props: {
+        allowDateChange: {
+            type: Boolean,
+            default: true
+        },
         allowedDates: Function,
         // Function formatting the day in date picker table
         dayFormat: Function,
@@ -4908,10 +4912,6 @@ function sanitizeDateString(dateString, type) {
         showWeek: Boolean,
         // Function formatting currently selected date in the picker title
         titleDateFormat: Function,
-        transitions: {
-            type: Boolean,
-            default: true
-        },
         type: {
             type: String,
             default: 'date',
@@ -5137,7 +5137,6 @@ function sanitizeDateString(dateString, type) {
                     disabled: this.disabled,
                     readonly: this.readonly,
                     selectingYear: this.activePicker === 'YEAR',
-                    transitions: this.transitions,
                     year: this.formatters.year(this.value ? "" + this.inputYear : this.tableDate),
                     yearIcon: this.yearIcon,
                     value: this.multiple ? this.value[0] : this.value
@@ -5154,6 +5153,7 @@ function sanitizeDateString(dateString, type) {
             var _this = this;
             return this.$createElement(_VDatePickerHeader__WEBPACK_IMPORTED_MODULE_1__["default"], {
                 props: {
+                    allowDateChange: this.allowDateChange,
                     nextIcon: this.nextIcon,
                     color: this.color,
                     dark: this.dark,
@@ -5165,7 +5165,6 @@ function sanitizeDateString(dateString, type) {
                     max: this.activePicker === 'DATE' ? this.maxMonth : this.maxYear,
                     prevIcon: this.prevIcon,
                     readonly: this.readonly,
-                    transitions: this.transitions,
                     value: this.activePicker === 'DATE' ? Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1) : "" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4)
                 },
                 on: {
@@ -5202,7 +5201,6 @@ function sanitizeDateString(dateString, type) {
                     scrollable: this.scrollable,
                     showWeek: this.showWeek,
                     tableDate: Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1),
-                    transitions: this.transitions,
                     value: this.value,
                     weekdayFormat: this.weekdayFormat
                 },
@@ -5486,6 +5484,7 @@ var __read = undefined && undefined.__read || function (o, n) {
 ).extend({
     name: 'v-date-picker-header',
     props: {
+        allowDateChange: Boolean,
         disabled: Boolean,
         format: Function,
         locale: {
@@ -5532,7 +5531,7 @@ var __read = undefined && undefined.__read || function (o, n) {
     methods: {
         genBtn: function genBtn(change) {
             var _this = this;
-            var disabled = this.disabled || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
+            var disabled = this.disabled || !this.allowDateChange || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
             return this.$createElement(_VBtn__WEBPACK_IMPORTED_MODULE_1__["default"], {
                 props: {
                     dark: this.dark,
@@ -5560,7 +5559,7 @@ var __read = undefined && undefined.__read || function (o, n) {
         },
         genHeader: function genHeader() {
             var _this = this;
-            var color = !this.disabled && (this.color || 'accent');
+            var color = !this.disabled && this.allowDateChange && (this.color || 'accent');
             var header = this.$createElement('div', this.setTextColor(color, {
                 key: String(this.value)
             }), [this.$createElement('button', {
@@ -5581,7 +5580,7 @@ var __read = undefined && undefined.__read || function (o, n) {
             return this.$createElement('div', {
                 staticClass: 'v-date-picker-header__value',
                 class: {
-                    'v-date-picker-header__value--disabled': this.disabled
+                    'v-date-picker-header__value--disabled': this.disabled || !this.allowDateChange
                 }
             }, [transition]);
         }
@@ -5589,7 +5588,7 @@ var __read = undefined && undefined.__read || function (o, n) {
     render: function render() {
         return this.$createElement('div', {
             staticClass: 'v-date-picker-header',
-            class: __assign({ 'v-date-picker-header--disabled': this.disabled }, this.themeClasses)
+            class: __assign({ 'v-date-picker-header--disabled': this.disabled || !this.allowDateChange }, this.themeClasses)
         }, [this.genBtn(-1), this.genHeader(), this.genBtn(+1)]);
     }
 }));
@@ -5967,7 +5966,6 @@ var __assign = undefined && undefined.__assign || function () {
         range: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
-        transitions: Boolean,
         tableDate: {
             type: String,
             required: true
@@ -5982,7 +5980,7 @@ var __assign = undefined && undefined.__assign || function () {
     },
     computed: {
         computedTransition: function computedTransition() {
-            return this.transitions ? this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition' : 'fade-transition';
+            return this.isReversing === !this.$vuetify.rtl ? 'tab-reverse-transition' : 'tab-transition';
         },
         displayedMonth: function displayedMonth() {
             return Number(this.tableDate.split('-')[1]) - 1;

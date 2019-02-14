@@ -25,6 +25,7 @@ export default mixins(
   name: 'v-date-picker-header',
 
   props: {
+    allowDateChange: Boolean,
     disabled: Boolean,
     format: Function as PropValidator<DatePickerFormatter | undefined>,
     locale: {
@@ -75,6 +76,7 @@ export default mixins(
   methods: {
     genBtn (change: number) {
       const disabled = this.disabled ||
+        !this.allowDateChange ||
         (change < 0 && this.min && this.calculateChange(change) < this.min) ||
         (change > 0 && this.max && this.calculateChange(change) > this.max)
 
@@ -105,7 +107,7 @@ export default mixins(
       }
     },
     genHeader () {
-      const color = !this.disabled && (this.color || 'accent')
+      const color = !this.disabled && this.allowDateChange && (this.color || 'accent')
       const header = this.$createElement('div', this.setTextColor(color, {
         key: String(this.value)
       }), [this.$createElement('button', {
@@ -126,7 +128,7 @@ export default mixins(
       return this.$createElement('div', {
         staticClass: 'v-date-picker-header__value',
         class: {
-          'v-date-picker-header__value--disabled': this.disabled
+          'v-date-picker-header__value--disabled': this.disabled || !this.allowDateChange
         }
       }, [transition])
     }
@@ -136,7 +138,7 @@ export default mixins(
     return this.$createElement('div', {
       staticClass: 'v-date-picker-header',
       class: {
-        'v-date-picker-header--disabled': this.disabled,
+        'v-date-picker-header--disabled': this.disabled || !this.allowDateChange,
         ...this.themeClasses
       }
     }, [
