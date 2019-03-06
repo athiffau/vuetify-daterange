@@ -26,6 +26,7 @@ exports.default = (0, _mixins2.default)(_pickerButton2.default
 ).extend({
     name: 'v-date-picker-title',
     props: {
+        allowDateChange: Boolean,
         date: {
             type: String,
             default: ''
@@ -68,7 +69,7 @@ exports.default = (0, _mixins2.default)(_pickerButton2.default
             }, this.yearIcon);
         },
         getYearBtn: function getYearBtn() {
-            return this.genPickerButton('selectingYear', true, [String(this.year), this.yearIcon ? this.genYearIcon() : null], false, 'v-date-picker-title__year');
+            return this.genPickerButton('selectingYear', true, [String(this.year), this.yearIcon ? this.genYearIcon() : null], !this.allowDateChange, 'v-date-picker-title__year');
         },
         genTitleText: function genTitleText() {
             return this.$createElement('transition', {
@@ -81,7 +82,7 @@ exports.default = (0, _mixins2.default)(_pickerButton2.default
             })]);
         },
         genTitleDate: function genTitleDate() {
-            return this.genPickerButton('selectingYear', false, [this.genTitleText()], false, 'v-date-picker-title__date');
+            return this.genPickerButton('selectingYear', false, [this.genTitleText()], !this.allowDateChange, 'v-date-picker-title__date');
         }
     },
     render: function render(h) {

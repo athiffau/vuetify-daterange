@@ -93,6 +93,10 @@ exports.default = (0, _mixins2.default)(_picker2.default
         },
         // Function formatting the tableDate in the day/month table header
         headerDateFormat: Function,
+        hideDisabled: {
+            type: Boolean,
+            default: false
+        },
         hoverLink: String,
         locale: {
             type: String,
@@ -246,6 +250,9 @@ exports.default = (0, _mixins2.default)(_picker2.default
         }
     },
     watch: {
+        activePicker: function activePicker(val) {
+            this.$emit('pickerType', val);
+        },
         tableDate: function tableDate(val, prev) {
             // Make a ISO 8601 strings from val and prev for comparision, otherwise it will incorrectly
             // compare for example '2000-9' and '2000-10'
@@ -256,8 +263,8 @@ exports.default = (0, _mixins2.default)(_picker2.default
         pickerDate: function pickerDate(val) {
             if (val) {
                 this.tableDate = val;
+                this.setInputDate();
             } else if (this.lastValue && this.type === 'date') {
-                console.log('Replace date with ' + this.lastValue);
                 this.tableDate = sanitizeDateString(this.lastValue, 'month');
             } else if (this.lastValue && this.type === 'month') {
                 this.tableDate = sanitizeDateString(this.lastValue, 'year');
@@ -349,6 +356,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
 
             return this.$createElement(_VDatePickerTitle2.default, {
                 props: {
+                    allowDateChange: this.allowDateChange,
                     date: this.value ? this.formatters.titleDate(this.value) : '',
                     disabled: this.disabled,
                     readonly: this.readonly,
@@ -376,6 +384,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     dark: this.dark,
                     disabled: this.disabled,
                     format: this.headerDateFormat,
+                    hideDisabled: this.hideDisabled,
                     light: this.light,
                     locale: this.locale,
                     min: this.activePicker === 'DATE' ? this.minMonth : this.minYear,
@@ -408,7 +417,6 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     eventColor: this.eventColor,
                     firstDayOfWeek: this.firstDayOfWeek,
                     format: this.dayFormat,
-                    hover: this.hovering,
                     hoverLink: this.hoverLink,
                     light: this.light,
                     locale: this.locale,
@@ -463,6 +471,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
                     readonly: this.readonly && this.type === 'month',
                     scrollable: this.scrollable,
                     value: this.selectedMonths,
+                    viewing: (0, _util.pad)(this.tableYear, 4) + '-' + (0, _util.pad)(this.tableMonth + 1),
                     tableDate: '' + (0, _util.pad)(this.tableYear, 4)
                 },
                 ref: 'table',
@@ -502,6 +511,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             }, children);
         },
         setInputDate: function setInputDate() {
+            var picker = this.pickerDate ? this.pickerDate.split('-') : null;
             if (this.lastValue) {
                 var array = this.lastValue.split('-');
                 this.inputYear = parseInt(array[0], 10);
@@ -509,6 +519,9 @@ exports.default = (0, _mixins2.default)(_picker2.default
                 if (this.type === 'date') {
                     this.inputDay = parseInt(array[2], 10);
                 }
+            } else if (picker && parseInt(picker[0], 10) !== this.inputYear) {
+                this.inputYear = parseInt(picker[0], 10);
+                this.inputMonth = parseInt(picker[1], 10) - 1;
             } else {
                 this.inputYear = this.inputYear || this.now.getFullYear();
                 this.inputMonth = this.inputMonth == null ? this.inputMonth : this.now.getMonth();

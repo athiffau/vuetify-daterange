@@ -7188,6 +7188,28 @@ table.v-table tfoot tr td {
 .v-date-picker-table .v-btn.v-btn--active {
   color: #fff;
 }
+.v-date-picker-table .v-btn--range {
+  border-radius: unset;
+}
+.v-date-picker-table .v-btn--range:before {
+  border-radius: unset;
+}
+.v-date-picker-table .v-btn--range-start {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.v-date-picker-table .v-btn--range-start:before {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.v-date-picker-table .v-btn--range-end {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.v-date-picker-table .v-btn--range-end:before {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
 .v-date-picker-table--month td {
   width: 33.333333%;
   height: 56px;

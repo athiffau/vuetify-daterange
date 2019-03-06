@@ -61,10 +61,6 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
                 return 'warning';
             }
         },
-        hover: {
-            type: String,
-            default: ''
-        },
         hoverLink: {
             type: String,
             default: ''
@@ -82,7 +78,8 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             type: String,
             required: true
         },
-        value: [String, Array]
+        value: [String, Array],
+        viewing: String
     },
     data: function data() {
         return {
@@ -149,17 +146,17 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             var isAllowed = (0, _isDateAllowed2.default)(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
+            var inView = mouseEventType === 'month' && formatter(this.viewing) === formatter(value);
             var isHover = value === this.hovering;
-            var isRange = this.range;
-            var isRangeStart = isRange && value === this.value[0];
-            var isRangeEnd = isRange && value === this.value[1];
-            var setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor;
-            //  AT -> Added support for date-range
-            //  const color = (isSelected || isCurrent) && (this.color || 'accent')
-            var color = this.getFinalColor(value, (isSelected || isCurrent) && (this.color || 'accent'));
+            var isRange = this.range && this.value.length > 0;
+            var isInRange = (0, _isDateInRange2.default)(value, this.value);
+            var isRangeEnd = isRange && (value === this.value[1] || !isInRange && (value === this.value[0] && (0, _isDateInRange.isHoverBeforeStartDate)(this.value[0], this.hoverLink) || value === this.hovering && (0, _isDateInRange.isHoverAfterStartDate)(this.value[0], this.hoverLink)));
+            var isRangeStart = isRange && !isRangeEnd && (value === this.value[0] || value === this.hovering && (0, _isDateInRange.isHoverBeforeStartDate)(this.value[0], this.hoverLink));
+            var setColor = isSelected || isRange || inView ? this.setBackgroundColor : this.setTextColor;
+            var color = this.getFinalColor(value, (isSelected || isCurrent || inView) && (this.color || 'accent'));
             return this.$createElement('button', setColor(color, {
                 staticClass: 'v-btn',
-                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
+                'class': this.genButtonClasses(isAllowed, isFloating, isSelected || inView, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
                 attrs: {
                     type: 'button'
                 },
@@ -176,9 +173,9 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         },
         getFinalColor: function getFinalColor(date, color) {
             var colorInRange = Array.isArray(this.value) && (0, _isDateInRange2.default)(date, this.value);
-            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && (0, _isDateInRange.isHoverAfterStartDate)(date, this.value[0], this.hover ? this.hover : this.hoverLink);
+            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && (0, _isDateInRange.isDateInHoverRange)(date, this.value[0], this.hoverLink);
             var colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1]);
-            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color;
+            return colorRangeNode ? this.color + ' accent darken-4' : colorInRange ? this.color + ' accent darken-2' : colorInRangeHover ? this.color + ' accent darken-3' : color;
         },
         getEventColors: function getEventColors(date) {
             var arrayize = function arrayize(v) {

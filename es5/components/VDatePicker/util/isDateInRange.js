@@ -3,8 +3,10 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = isDateInRange;
 exports.isHoverAfterStartDate = isHoverAfterStartDate;
+exports.isHoverBeforeStartDate = isHoverBeforeStartDate;
+exports.isDateInHoverRange = isDateInHoverRange;
+exports.default = isDateInRange;
 function dateFromStr(strDate) {
     var deltaDay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var deltaMonth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
@@ -23,6 +25,22 @@ function dateFromStr(strDate) {
     }
     return null;
 }
+function isHoverAfterStartDate(startDate, hoveringDate) {
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd ? _htd.getTime() > _std.getTime() : false;
+}
+function isHoverBeforeStartDate(startDate, hoveringDate) {
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd ? _htd.getTime() < _std.getTime() : false;
+}
+function isDateInHoverRange(btnDate, startDate, hoveringDate) {
+    var _me = dateFromStr(btnDate);
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd && _me ? _me.getTime() > _std.getTime() && _me.getTime() <= _htd.getTime() || _me.getTime() < _std.getTime() && _me.getTime() >= _htd.getTime() : false;
+}
 function isDateInRange(date, range) {
     var dateToCheck = dateFromStr(date);
     if (Array.isArray(range)) {
@@ -33,11 +51,5 @@ function isDateInRange(date, range) {
         }
     }
     return false;
-}
-function isHoverAfterStartDate(btnDate, startDate, hoveringDate) {
-    var _me = dateFromStr(btnDate);
-    var _std = dateFromStr(startDate);
-    var _htd = dateFromStr(hoveringDate);
-    return _std && _htd && _me ? _me.getTime() >= _std.getTime() && _me.getTime() <= _htd.getTime() && _std.getTime() < _htd.getTime() : false;
 }
 //# sourceMappingURL=isDateInRange.js.map

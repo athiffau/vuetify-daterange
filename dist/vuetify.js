@@ -4882,6 +4882,10 @@ function sanitizeDateString(dateString, type) {
         },
         // Function formatting the tableDate in the day/month table header
         headerDateFormat: Function,
+        hideDisabled: {
+            type: Boolean,
+            default: false
+        },
         hoverLink: String,
         locale: {
             type: String,
@@ -5032,6 +5036,9 @@ function sanitizeDateString(dateString, type) {
         }
     },
     watch: {
+        activePicker: function activePicker(val) {
+            this.$emit('pickerType', val);
+        },
         tableDate: function tableDate(val, prev) {
             // Make a ISO 8601 strings from val and prev for comparision, otherwise it will incorrectly
             // compare for example '2000-9' and '2000-10'
@@ -5042,8 +5049,8 @@ function sanitizeDateString(dateString, type) {
         pickerDate: function pickerDate(val) {
             if (val) {
                 this.tableDate = val;
+                this.setInputDate();
             } else if (this.lastValue && this.type === 'date') {
-                console.log("Replace date with " + this.lastValue);
                 this.tableDate = sanitizeDateString(this.lastValue, 'month');
             } else if (this.lastValue && this.type === 'month') {
                 this.tableDate = sanitizeDateString(this.lastValue, 'year');
@@ -5133,6 +5140,7 @@ function sanitizeDateString(dateString, type) {
             var _this = this;
             return this.$createElement(_VDatePickerTitle__WEBPACK_IMPORTED_MODULE_0__["default"], {
                 props: {
+                    allowDateChange: this.allowDateChange,
                     date: this.value ? this.formatters.titleDate(this.value) : '',
                     disabled: this.disabled,
                     readonly: this.readonly,
@@ -5159,6 +5167,7 @@ function sanitizeDateString(dateString, type) {
                     dark: this.dark,
                     disabled: this.disabled,
                     format: this.headerDateFormat,
+                    hideDisabled: this.hideDisabled,
                     light: this.light,
                     locale: this.locale,
                     min: this.activePicker === 'DATE' ? this.minMonth : this.minYear,
@@ -5190,7 +5199,6 @@ function sanitizeDateString(dateString, type) {
                     eventColor: this.eventColor,
                     firstDayOfWeek: this.firstDayOfWeek,
                     format: this.dayFormat,
-                    hover: this.hovering,
                     hoverLink: this.hoverLink,
                     light: this.light,
                     locale: this.locale,
@@ -5244,6 +5252,7 @@ function sanitizeDateString(dateString, type) {
                     readonly: this.readonly && this.type === 'month',
                     scrollable: this.scrollable,
                     value: this.selectedMonths,
+                    viewing: Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1),
                     tableDate: "" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableYear, 4)
                 },
                 ref: 'table',
@@ -5283,6 +5292,7 @@ function sanitizeDateString(dateString, type) {
             }, children);
         },
         setInputDate: function setInputDate() {
+            var picker = this.pickerDate ? this.pickerDate.split('-') : null;
             if (this.lastValue) {
                 var array = this.lastValue.split('-');
                 this.inputYear = parseInt(array[0], 10);
@@ -5290,6 +5300,9 @@ function sanitizeDateString(dateString, type) {
                 if (this.type === 'date') {
                     this.inputDay = parseInt(array[2], 10);
                 }
+            } else if (picker && parseInt(picker[0], 10) !== this.inputYear) {
+                this.inputYear = parseInt(picker[0], 10);
+                this.inputMonth = parseInt(picker[1], 10) - 1;
             } else {
                 this.inputYear = this.inputYear || this.now.getFullYear();
                 this.inputMonth = this.inputMonth == null ? this.inputMonth : this.now.getMonth();
@@ -5487,6 +5500,7 @@ var __read = undefined && undefined.__read || function (o, n) {
         allowDateChange: Boolean,
         disabled: Boolean,
         format: Function,
+        hideDisabled: Boolean,
         locale: {
             type: String,
             default: 'en-us'
@@ -5532,7 +5546,7 @@ var __read = undefined && undefined.__read || function (o, n) {
         genBtn: function genBtn(change) {
             var _this = this;
             var disabled = this.disabled || !this.allowDateChange || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
-            return this.$createElement(_VBtn__WEBPACK_IMPORTED_MODULE_1__["default"], {
+            return this.hideDisabled && disabled ? null : this.$createElement(_VBtn__WEBPACK_IMPORTED_MODULE_1__["default"], {
                 props: {
                     dark: this.dark,
                     disabled: disabled,
@@ -5682,6 +5696,7 @@ __webpack_require__.r(__webpack_exports__);
 ).extend({
     name: 'v-date-picker-title',
     props: {
+        allowDateChange: Boolean,
         date: {
             type: String,
             default: ''
@@ -5724,7 +5739,7 @@ __webpack_require__.r(__webpack_exports__);
             }, this.yearIcon);
         },
         getYearBtn: function getYearBtn() {
-            return this.genPickerButton('selectingYear', true, [String(this.year), this.yearIcon ? this.genYearIcon() : null], false, 'v-date-picker-title__year');
+            return this.genPickerButton('selectingYear', true, [String(this.year), this.yearIcon ? this.genYearIcon() : null], !this.allowDateChange, 'v-date-picker-title__year');
         },
         genTitleText: function genTitleText() {
             return this.$createElement('transition', {
@@ -5737,7 +5752,7 @@ __webpack_require__.r(__webpack_exports__);
             })]);
         },
         genTitleDate: function genTitleDate() {
-            return this.genPickerButton('selectingYear', false, [this.genTitleText()], false, 'v-date-picker-title__date');
+            return this.genPickerButton('selectingYear', false, [this.genTitleText()], !this.allowDateChange, 'v-date-picker-title__date');
         }
     },
     render: function render(h) {
@@ -5949,10 +5964,6 @@ var __assign = undefined && undefined.__assign || function () {
                 return 'warning';
             }
         },
-        hover: {
-            type: String,
-            default: ''
-        },
         hoverLink: {
             type: String,
             default: ''
@@ -5970,7 +5981,8 @@ var __assign = undefined && undefined.__assign || function () {
             type: String,
             required: true
         },
-        value: [String, Array]
+        value: [String, Array],
+        viewing: String
     },
     data: function data() {
         return {
@@ -6024,17 +6036,17 @@ var __assign = undefined && undefined.__assign || function () {
             var isAllowed = Object(_util_isDateAllowed__WEBPACK_IMPORTED_MODULE_4__["default"])(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
+            var inView = mouseEventType === 'month' && formatter(this.viewing) === formatter(value);
             var isHover = value === this.hovering;
-            var isRange = this.range;
-            var isRangeStart = isRange && value === this.value[0];
-            var isRangeEnd = isRange && value === this.value[1];
-            var setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor;
-            //  AT -> Added support for date-range
-            //  const color = (isSelected || isCurrent) && (this.color || 'accent')
-            var color = this.getFinalColor(value, (isSelected || isCurrent) && (this.color || 'accent'));
+            var isRange = this.range && this.value.length > 0;
+            var isInRange = Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["default"])(value, this.value);
+            var isRangeEnd = isRange && (value === this.value[1] || !isInRange && (value === this.value[0] && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverBeforeStartDate"])(this.value[0], this.hoverLink) || value === this.hovering && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverAfterStartDate"])(this.value[0], this.hoverLink)));
+            var isRangeStart = isRange && !isRangeEnd && (value === this.value[0] || value === this.hovering && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverBeforeStartDate"])(this.value[0], this.hoverLink));
+            var setColor = isSelected || isRange || inView ? this.setBackgroundColor : this.setTextColor;
+            var color = this.getFinalColor(value, (isSelected || isCurrent || inView) && (this.color || 'accent'));
             return this.$createElement('button', setColor(color, {
                 staticClass: 'v-btn',
-                'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
+                'class': this.genButtonClasses(isAllowed, isFloating, isSelected || inView, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
                 attrs: {
                     type: 'button'
                 },
@@ -6051,9 +6063,9 @@ var __assign = undefined && undefined.__assign || function () {
         },
         getFinalColor: function getFinalColor(date, color) {
             var colorInRange = Array.isArray(this.value) && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["default"])(date, this.value);
-            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverAfterStartDate"])(date, this.value[0], this.hover ? this.hover : this.hoverLink);
+            var colorInRangeHover = Array.isArray(this.value) && this.value.length === 1 && typeof this.value[0] === 'string' && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isDateInHoverRange"])(date, this.value[0], this.hoverLink);
             var colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1]);
-            return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color;
+            return colorRangeNode ? this.color + " accent darken-4" : colorInRange ? this.color + " accent darken-2" : colorInRangeHover ? this.color + " accent darken-3" : color;
         },
         getEventColors: function getEventColors(date) {
             var arrayize = function arrayize(v) {
@@ -6239,13 +6251,15 @@ function isDateAllowed(date, min, max, allowedFn) {
 /*!**********************************************************!*\
   !*** ./src/components/VDatePicker/util/isDateInRange.ts ***!
   \**********************************************************/
-/*! exports provided: default, isHoverAfterStartDate */
+/*! exports provided: isHoverAfterStartDate, isHoverBeforeStartDate, isDateInHoverRange, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return isDateInRange; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isHoverAfterStartDate", function() { return isHoverAfterStartDate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isHoverBeforeStartDate", function() { return isHoverBeforeStartDate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isDateInHoverRange", function() { return isDateInHoverRange; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return isDateInRange; });
 function dateFromStr(strDate, deltaDay, deltaMonth, deltaYear) {
     if (deltaDay === void 0) {
         deltaDay = 0;
@@ -6269,6 +6283,22 @@ function dateFromStr(strDate, deltaDay, deltaMonth, deltaYear) {
     }
     return null;
 }
+function isHoverAfterStartDate(startDate, hoveringDate) {
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd ? _htd.getTime() > _std.getTime() : false;
+}
+function isHoverBeforeStartDate(startDate, hoveringDate) {
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd ? _htd.getTime() < _std.getTime() : false;
+}
+function isDateInHoverRange(btnDate, startDate, hoveringDate) {
+    var _me = dateFromStr(btnDate);
+    var _std = dateFromStr(startDate);
+    var _htd = dateFromStr(hoveringDate);
+    return _std && _htd && _me ? _me.getTime() > _std.getTime() && _me.getTime() <= _htd.getTime() || _me.getTime() < _std.getTime() && _me.getTime() >= _htd.getTime() : false;
+}
 function isDateInRange(date, range) {
     var dateToCheck = dateFromStr(date);
     if (Array.isArray(range)) {
@@ -6279,12 +6309,6 @@ function isDateInRange(date, range) {
         }
     }
     return false;
-}
-function isHoverAfterStartDate(btnDate, startDate, hoveringDate) {
-    var _me = dateFromStr(btnDate);
-    var _std = dateFromStr(startDate);
-    var _htd = dateFromStr(hoveringDate);
-    return _std && _htd && _me ? _me.getTime() >= _std.getTime() && _me.getTime() <= _htd.getTime() && _std.getTime() < _htd.getTime() : false;
 }
 
 /***/ }),

@@ -48,6 +48,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
         allowDateChange: Boolean,
         disabled: Boolean,
         format: Function,
+        hideDisabled: Boolean,
         locale: {
             type: String,
             default: 'en-us'
@@ -95,7 +96,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             var _this = this;
 
             var disabled = this.disabled || !this.allowDateChange || change < 0 && this.min && this.calculateChange(change) < this.min || change > 0 && this.max && this.calculateChange(change) > this.max;
-            return this.$createElement(_VBtn2.default, {
+            return this.hideDisabled && disabled ? null : this.$createElement(_VBtn2.default, {
                 props: {
                     dark: this.dark,
                     disabled: disabled,
