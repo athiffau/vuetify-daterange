@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'Vrstic na stran:'
     },
-    noDataText: 'Ni podatkov'
+    noDataText: 'Ni podatkov',
+    carousel: {
+        prev: 'Prejšnji vizualni prikaz',
+        next: 'Naslednja vizuala'
+    }
 };
 //# sourceMappingURL=sl.js.map

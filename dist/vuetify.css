@@ -2389,11 +2389,6 @@ video {
 [aria-disabled] {
   cursor: default;
 }
-::-moz-selection {
-  background-color: #b3d4fc; /* Required when declaring ::selection */
-  color: #000;
-  text-shadow: none;
-}
 ::selection {
   background-color: #b3d4fc; /* Required when declaring ::selection */
   color: #000;
@@ -2765,7 +2760,7 @@ code:after,
 kbd:after,
 code:before,
 kbd:before {
-  content: "\A0";
+  content: "\00a0";
   letter-spacing: -1px;
 }
 code {
@@ -3219,6 +3214,7 @@ p {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  line-height: 1.1 !important;
 }
 .transition-fast-out-slow-in {
   transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -5495,19 +5491,25 @@ p {
   margin: 0 !important;
   padding: 0 !important;
 }
-.v-dialog--scrollable {
+.v-dialog--scrollable,
+.v-dialog--scrollable > form {
   display: flex;
 }
-.v-dialog--scrollable > .v-card {
+.v-dialog--scrollable > .v-card,
+.v-dialog--scrollable > form > .v-card {
   display: flex;
   flex: 1 1 100%;
+  max-width: 100%;
   flex-direction: column;
 }
 .v-dialog--scrollable > .v-card > .v-card__title,
-.v-dialog--scrollable > .v-card > .v-card__actions {
+.v-dialog--scrollable > form > .v-card > .v-card__title,
+.v-dialog--scrollable > .v-card > .v-card__actions,
+.v-dialog--scrollable > form > .v-card > .v-card__actions {
   flex: 1 0 auto;
 }
-.v-dialog--scrollable > .v-card > .v-card__text {
+.v-dialog--scrollable > .v-card > .v-card__text,
+.v-dialog--scrollable > form > .v-card > .v-card__text {
   overflow-y: auto;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
@@ -5974,6 +5976,11 @@ p {
 .v-btn:not(.v-btn--outline).warning,
 .v-btn:not(.v-btn--outline).info {
   color: #fff;
+}
+@media (hover: none) {
+  .v-btn:hover::before {
+    background-color: transparent;
+  }
 }
 
 .v-progress-circular {
@@ -9335,27 +9342,6 @@ table.v-table tfoot tr td {
   display: flex;
   justify-content: center;
   position: absolute;
-}
-.v-speed-dial__list .v-btn:nth-child(1) {
-  transition-delay: 0.05s;
-}
-.v-speed-dial__list .v-btn:nth-child(2) {
-  transition-delay: 0.1s;
-}
-.v-speed-dial__list .v-btn:nth-child(3) {
-  transition-delay: 0.15s;
-}
-.v-speed-dial__list .v-btn:nth-child(4) {
-  transition-delay: 0.2s;
-}
-.v-speed-dial__list .v-btn:nth-child(5) {
-  transition-delay: 0.25s;
-}
-.v-speed-dial__list .v-btn:nth-child(6) {
-  transition-delay: 0.3s;
-}
-.v-speed-dial__list .v-btn:nth-child(7) {
-  transition-delay: 0.35s;
 }
 
 .theme--light.v-stepper {

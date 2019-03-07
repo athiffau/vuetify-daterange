@@ -87,7 +87,7 @@ var Vuetify = {
         })(opts.components);
     },
 
-    version: '1.5.0'
+    version: '1.5.5'
 };
 // Utils
 function checkVueVersion(Vue, requiredVue) {

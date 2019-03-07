@@ -63,7 +63,7 @@ var VIcon = (0, _mixins2.default)(_colorable2.default, _sizeable2.default, _them
     methods: {
         getIcon: function getIcon() {
             var iconName = '';
-            if (this.$slots.default) iconName = this.$slots.default[0].text;
+            if (this.$slots.default) iconName = this.$slots.default[0].text.trim();
             return (0, _helpers.remapInternalIcon)(this, iconName);
         },
         getSize: function getSize() {
@@ -135,6 +135,7 @@ var VIcon = (0, _mixins2.default)(_colorable2.default, _sizeable2.default, _them
             this.applyColors(data);
             var component = icon.component;
             data.props = icon.props;
+            data.nativeOn = data.on;
             return h(component, data);
         }
     },

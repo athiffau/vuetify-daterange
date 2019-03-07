@@ -83,32 +83,10 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             };
         },
         getStartOfWeek: function getStartOfWeek(timestamp) {
-            var start = (0, _timestamp.copyTimestamp)(timestamp);
-            (0, _timestamp.findWeekday)(start, this.weekdays[0], _timestamp.prevDay);
-            (0, _timestamp.updateFormatted)(start);
-            (0, _timestamp.updateRelative)(start, this.times.today, start.hasTime);
-            return start;
+            return (0, _timestamp.getStartOfWeek)(timestamp, this.weekdays, this.times.today);
         },
         getEndOfWeek: function getEndOfWeek(timestamp) {
-            var end = (0, _timestamp.copyTimestamp)(timestamp);
-            (0, _timestamp.findWeekday)(end, this.weekdays[this.weekdays.length - 1]);
-            (0, _timestamp.updateFormatted)(end);
-            (0, _timestamp.updateRelative)(end, this.times.today, end.hasTime);
-            return end;
-        },
-        getStartOfMonth: function getStartOfMonth(timestamp) {
-            var start = (0, _timestamp.copyTimestamp)(timestamp);
-            start.day = _timestamp.DAY_MIN;
-            (0, _timestamp.updateWeekday)(start);
-            (0, _timestamp.updateFormatted)(start);
-            return start;
-        },
-        getEndOfMonth: function getEndOfMonth(timestamp) {
-            var end = (0, _timestamp.copyTimestamp)(timestamp);
-            end.day = (0, _timestamp.daysInMonth)(end.year, end.month);
-            (0, _timestamp.updateWeekday)(end);
-            (0, _timestamp.updateFormatted)(end);
-            return end;
+            return (0, _timestamp.getEndOfWeek)(timestamp, this.weekdays, this.times.today);
         }
     }
 }); // Mixins

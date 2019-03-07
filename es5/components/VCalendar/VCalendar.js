@@ -60,8 +60,8 @@ exports.default = _calendarBase2.default.extend({
             switch (this.type) {
                 case 'month':
                     component = _VCalendarMonthly2.default;
-                    start = this.getStartOfMonth(around);
-                    end = this.getEndOfMonth(around);
+                    start = (0, _timestamp.getStartOfMonth)(around);
+                    end = (0, _timestamp.getEndOfMonth)(around);
                     break;
                 case 'week':
                     component = _VCalendarDaily2.default;
@@ -195,7 +195,7 @@ exports.default = _calendarBase2.default.extend({
             on: _extends({}, this.$listeners, {
                 'click:date': function clickDate(day) {
                     if (_this.$listeners['input']) {
-                        _this.$emit('input', day);
+                        _this.$emit('input', day.date);
                     }
                     if (_this.$listeners['click:date']) {
                         _this.$emit('click:date', day);

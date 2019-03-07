@@ -89,9 +89,11 @@ exports.default = (0, _mixins2.default)(_themeable2.default
         genItems: function genItems() {
             var items = [];
             var hasSlot = !!this.$scopedSlots.item;
+            var keys = [];
             for (var i = 0; i < this.items.length; i++) {
                 var item = this.items[i];
-                if (hasSlot) items.push(this.$scopedSlots.item({ item: item }));else items.push(this.$createElement(_.VBreadcrumbsItem, { key: item.text, props: item }, [item.text]));
+                keys.push(item.text);
+                if (hasSlot) items.push(this.$scopedSlots.item({ item: item }));else items.push(this.$createElement(_.VBreadcrumbsItem, { key: keys.join('.'), props: item }, [item.text]));
                 if (i < this.items.length - 1) items.push(this.genDivider());
             }
             return items;

@@ -95,7 +95,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
     methods: {
         wheel: function wheel(e) {
             e.preventDefault();
-            var delta = Math.sign(e.wheelDelta || 1);
+            var delta = Math.sign(-e.deltaY || 1);
             var value = this.displayedValue;
             do {
                 value = value + delta;

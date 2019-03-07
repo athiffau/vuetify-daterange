@@ -109,6 +109,7 @@ exports.default = _vue2.default.extend({
             absoluteY: 0,
             dimensions: Object.assign({}, dimensions),
             isContentActive: false,
+            pageWidth: 0,
             pageYOffset: 0,
             stackClass: 'v-menu__content--active',
             stackMinZIndex: 6
@@ -179,23 +180,19 @@ exports.default = _vue2.default.extend({
             };
         },
         activate: function activate() {},
-        calcLeft: function calcLeft() {
-            return (this.isAttached ? this.computedLeft : this.calcXOverflow(this.computedLeft)) + 'px';
+        calcLeft: function calcLeft(menuWidth) {
+            return (this.isAttached ? this.computedLeft : this.calcXOverflow(this.computedLeft, menuWidth)) + 'px';
         },
         calcTop: function calcTop() {
             return (this.isAttached ? this.computedTop : this.calcYOverflow(this.computedTop)) + 'px';
         },
-        calcXOverflow: function calcXOverflow(left) {
-            var parsedMaxWidth = isNaN(parseInt(this.maxWidth)) ? 0 : parseInt(this.maxWidth);
-            var innerWidth = this.getInnerWidth();
-            var maxWidth = Math.max(this.dimensions.content.width, parsedMaxWidth);
-            var totalWidth = left + this.dimensions.activator.width;
-            var availableWidth = totalWidth - innerWidth;
-            if ((!this.left || this.right) && availableWidth > 0) {
-                left = innerWidth - maxWidth - (innerWidth > 600 ? 30 : 12) // Account for scrollbar
-                ;
+        calcXOverflow: function calcXOverflow(left, menuWidth) {
+            var xOverflow = left + menuWidth - this.pageWidth + 12;
+            if ((!this.left || this.right) && xOverflow > 0) {
+                left = Math.max(left - xOverflow, 0);
+            } else {
+                left = Math.max(left, 12);
             }
-            if (left < 0) left = 12;
             return left + this.getOffsetLeft();
         },
         calcYOverflow: function calcYOverflow(top) {
@@ -255,15 +252,16 @@ exports.default = _vue2.default.extend({
                 return this.activatedBy;
             }
             if (this.activatedBy) return this.activatedBy;
+            if (this.activatorNode) {
+                var activator = Array.isArray(this.activatorNode) ? this.activatorNode[0] : this.activatorNode;
+                var el = activator && activator.elm;
+                if (el) return el;
+            }
             (0, _console.consoleError)('No activator found');
         },
         getInnerHeight: function getInnerHeight() {
             if (!this.hasWindow) return 0;
             return window.innerHeight || document.documentElement.clientHeight;
-        },
-        getInnerWidth: function getInnerWidth() {
-            if (!this.hasWindow) return 0;
-            return window.innerWidth;
         },
         getOffsetLeft: function getOffsetLeft() {
             if (!this.hasWindow) return 0;
@@ -324,6 +322,7 @@ exports.default = _vue2.default.extend({
 
             this.checkForWindow();
             this.checkForPageYOffset();
+            this.pageWidth = document.documentElement.clientWidth;
             var dimensions = {};
             // Activator should already be shown
             if (!this.hasActivator || this.absolute) {

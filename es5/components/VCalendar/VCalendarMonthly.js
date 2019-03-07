@@ -24,10 +24,10 @@ exports.default = _VCalendarWeekly2.default.extend({
             return 'v-calendar-monthly v-calendar-weekly';
         },
         parsedStart: function parsedStart() {
-            return this.getStartOfMonth((0, _timestamp.parseTimestamp)(this.start));
+            return (0, _timestamp.getStartOfMonth)((0, _timestamp.parseTimestamp)(this.start));
         },
         parsedEnd: function parsedEnd() {
-            return this.getEndOfMonth((0, _timestamp.parseTimestamp)(this.end));
+            return (0, _timestamp.getEndOfMonth)((0, _timestamp.parseTimestamp)(this.end));
         }
     }
 });

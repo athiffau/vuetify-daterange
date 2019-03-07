@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'Rânduri pe pagină:'
     },
-    noDataText: 'Nu există date disponibile'
+    noDataText: 'Nu există date disponibile',
+    carousel: {
+        prev: 'Anterior vizual',
+        next: 'Următorul vizual'
+    }
 };
 //# sourceMappingURL=ro.js.map

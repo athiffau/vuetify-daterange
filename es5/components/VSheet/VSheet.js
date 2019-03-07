@@ -59,7 +59,8 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _elevatable2.defaul
     render: function render(h) {
         var data = {
             class: this.classes,
-            style: this.styles
+            style: this.styles,
+            on: this.$listeners
         };
         return h(this.tag, this.setBackgroundColor(this.color, data), this.$slots.default);
     }

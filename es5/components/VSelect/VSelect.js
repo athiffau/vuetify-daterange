@@ -710,8 +710,9 @@ exports.default = _VTextField2.default.extend({
             this.selectedItems = selectedItems;
         },
         setValue: function setValue(value) {
-            value !== this.internalValue && this.$emit('change', value);
+            var oldValue = this.internalValue;
             this.internalValue = value;
+            value !== oldValue && this.$emit('change', value);
         }
     }
 });

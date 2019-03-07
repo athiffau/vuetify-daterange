@@ -28,6 +28,7 @@ export default mixins(
     allowDateChange: Boolean,
     disabled: Boolean,
     format: Function as PropValidator<DatePickerFormatter | undefined>,
+    hideDisabled: Boolean,
     locale: {
       type: String,
       default: 'en-us'
@@ -80,22 +81,25 @@ export default mixins(
         (change < 0 && this.min && this.calculateChange(change) < this.min) ||
         (change > 0 && this.max && this.calculateChange(change) > this.max)
 
-      return this.$createElement(VBtn, {
-        props: {
-          dark: this.dark,
-          disabled,
-          icon: true,
-          light: this.light
-        },
-        nativeOn: {
-          click: (e: Event) => {
-            e.stopPropagation()
-            this.$emit('input', this.calculateChange(change))
+      return this.hideDisabled &&
+      disabled
+        ? null
+        : this.$createElement(VBtn, {
+          props: {
+            dark: this.dark,
+            disabled,
+            icon: true,
+            light: this.light
+          },
+          nativeOn: {
+            click: (e: Event) => {
+              e.stopPropagation()
+              this.$emit('input', this.calculateChange(change))
+            }
           }
-        }
-      }, [
-        this.$createElement(VIcon, ((change < 0) === !this.$vuetify.rtl) ? this.prevIcon : this.nextIcon)
-      ])
+        }, [
+          this.$createElement(VIcon, ((change < 0) === !this.$vuetify.rtl) ? this.prevIcon : this.nextIcon)
+        ])
     },
     calculateChange (sign: number) {
       const [year, month] = String(this.value).split('-').map(Number)

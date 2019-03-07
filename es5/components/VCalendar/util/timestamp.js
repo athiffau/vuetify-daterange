@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+exports.getStartOfWeek = getStartOfWeek;
+exports.getEndOfWeek = getEndOfWeek;
+exports.getStartOfMonth = getStartOfMonth;
+exports.getEndOfMonth = getEndOfMonth;
 exports.parseTime = parseTime;
 exports.validateTimestamp = validateTimestamp;
 exports.parseTimestamp = parseTimestamp;
@@ -32,8 +36,8 @@ exports.getWeekdaySkips = getWeekdaySkips;
 exports.createDayList = createDayList;
 exports.createIntervalList = createIntervalList;
 exports.createNativeLocaleFormatter = createNativeLocaleFormatter;
-var PARSE_REGEX = exports.PARSE_REGEX = /^(\d{1,4})-(\d{1,2})(-(\d{1,2}))?([^\d]+(\d{1,2}))?(:(\d{1,2}))?(:(\d{1,2}))?$/;
-var PARSE_TIME = exports.PARSE_TIME = /(\d{1,2})?(:(\d{1,2}))?(:(\d{1,2}))/;
+var PARSE_REGEX = exports.PARSE_REGEX = /^(\d{4})-(\d{1,2})(-(\d{1,2}))?([^\d]+(\d{1,2}))?(:(\d{1,2}))?(:(\d{1,2}))?$/;
+var PARSE_TIME = exports.PARSE_TIME = /(\d\d?)(:(\d\d?)|)(:(\d\d?)|)/;
 var DAYS_IN_MONTH = exports.DAYS_IN_MONTH = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var DAYS_IN_MONTH_LEAP = exports.DAYS_IN_MONTH_LEAP = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var DAYS_IN_MONTH_MIN = exports.DAYS_IN_MONTH_MIN = 28;
@@ -45,6 +49,38 @@ var DAYS_IN_WEEK = exports.DAYS_IN_WEEK = 7;
 var MINUTES_IN_HOUR = exports.MINUTES_IN_HOUR = 60;
 var HOURS_IN_DAY = exports.HOURS_IN_DAY = 24;
 var FIRST_HOUR = exports.FIRST_HOUR = 0;
+function getStartOfWeek(timestamp, weekdays, today) {
+    var start = copyTimestamp(timestamp);
+    findWeekday(start, weekdays[0], prevDay);
+    updateFormatted(start);
+    if (today) {
+        updateRelative(start, today, start.hasTime);
+    }
+    return start;
+}
+function getEndOfWeek(timestamp, weekdays, today) {
+    var end = copyTimestamp(timestamp);
+    findWeekday(end, weekdays[weekdays.length - 1]);
+    updateFormatted(end);
+    if (today) {
+        updateRelative(end, today, end.hasTime);
+    }
+    return end;
+}
+function getStartOfMonth(timestamp) {
+    var start = copyTimestamp(timestamp);
+    start.day = DAY_MIN;
+    updateWeekday(start);
+    updateFormatted(start);
+    return start;
+}
+function getEndOfMonth(timestamp) {
+    var end = copyTimestamp(timestamp);
+    end.day = daysInMonth(end.year, end.month);
+    updateWeekday(end);
+    updateFormatted(end);
+    return end;
+}
 function parseTime(input) {
     if (typeof input === 'number') {
         // when a number is given, it's minutes since 12:00am
@@ -55,7 +91,7 @@ function parseTime(input) {
         if (!parts) {
             return false;
         }
-        return parseInt(parts[1]) * 60 + parseInt(parts[2] || 0);
+        return parseInt(parts[1]) * 60 + parseInt(parts[3] || 0);
     } else if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object') {
         // when an object is given, it must have hour and minute
         if (typeof input.hour !== 'number' || typeof input.minute !== 'number') {
@@ -114,7 +150,7 @@ function parseDate(date) {
     });
 }
 function getDayIdentifier(timestamp) {
-    return timestamp.year * 1000000 + timestamp.month * 100 + timestamp.day;
+    return timestamp.year * 10000 + timestamp.month * 100 + timestamp.day;
 }
 function getTimeIdentifier(timestamp) {
     return timestamp.hour * 100 + timestamp.minute;
@@ -161,7 +197,7 @@ function getWeekday(timestamp) {
         var m = (timestamp.month + 9) % MONTH_MAX + 1;
         var C = _(timestamp.year / 100);
         var Y = timestamp.year % 100 - (timestamp.month <= 2 ? 1 : 0);
-        return (k + _(2.6 * m - 0.2) - 2 * C + Y + _(Y / 4) + _(C / 4)) % 7;
+        return ((k + _(2.6 * m - 0.2) - 2 * C + Y + _(Y / 4) + _(C / 4)) % 7 + 7) % 7;
     }
     return timestamp.weekday;
 }

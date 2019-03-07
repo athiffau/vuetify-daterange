@@ -193,6 +193,9 @@ exports.default = _VSelect2.default.extend({
         },
         internalSearch: function internalSearch(val) {
             this.onInternalSearchChanged(val);
+        },
+        itemText: function itemText() {
+            this.updateSelf();
         }
     },
     created: function created() {

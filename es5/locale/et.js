@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'Ridu leheküljel:'
     },
-    noDataText: 'Andmed puuduvad'
+    noDataText: 'Andmed puuduvad',
+    carousel: {
+        prev: 'Eelmine visuaalne',
+        next: 'Järgmine visuaalne'
+    }
 };
 //# sourceMappingURL=et.js.map

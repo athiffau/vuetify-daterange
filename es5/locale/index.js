@@ -211,6 +211,15 @@ Object.defineProperty(exports, 'th', {
   }
 });
 
+var _tr = require('./tr');
+
+Object.defineProperty(exports, 'tr', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_tr).default;
+  }
+});
+
 var _uk = require('./uk');
 
 Object.defineProperty(exports, 'uk', {

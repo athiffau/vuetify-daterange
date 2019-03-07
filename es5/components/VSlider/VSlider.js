@@ -467,7 +467,7 @@ exports.default = _VInput2.default.extend({
             var decimals = trimmedStep.indexOf('.') > -1 ? trimmedStep.length - trimmedStep.indexOf('.') - 1 : 0;
             var offset = this.min % this.stepNumeric;
             var newValue = Math.round((value - offset) / this.stepNumeric) * this.stepNumeric + offset;
-            return parseFloat(Math.min(newValue, this.max).toFixed(decimals));
+            return parseFloat(Math.max(Math.min(newValue, this.max), this.min).toFixed(decimals));
         },
         setInternalValue: function setInternalValue(value) {
             this.internalValue = value;

@@ -32,6 +32,8 @@ var _toggleable2 = _interopRequireDefault(_toggleable);
 
 var _helpers = require('../../util/helpers');
 
+var _console = require('../../util/console');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -93,7 +95,7 @@ exports.default = {
             }
             if (this.nudgeLeft) left -= parseInt(this.nudgeLeft);
             if (this.nudgeRight) left += parseInt(this.nudgeRight);
-            return this.calcXOverflow(left) + 'px';
+            return this.calcXOverflow(left, this.dimensions.content.width) + 'px';
         },
         calculatedTop: function calculatedTop() {
             var _dimensions2 = this.dimensions,
@@ -137,6 +139,7 @@ exports.default = {
             return {
                 left: this.calculatedLeft,
                 maxWidth: (0, _helpers.convertToUnit)(this.maxWidth),
+                minWidth: (0, _helpers.convertToUnit)(this.minWidth),
                 opacity: this.isActive ? 0.9 : 0,
                 top: this.calculatedTop,
                 zIndex: this.zIndex || this.activeZIndex
@@ -149,6 +152,11 @@ exports.default = {
         this.$nextTick(function () {
             _this.value && _this.callActivate();
         });
+    },
+    mounted: function mounted() {
+        if ((0, _helpers.getSlotType)(this, 'activator', true) === 'v-slot') {
+            (0, _console.consoleError)('v-tooltip\'s activator slot must be bound, try \'<template #activator="data"><v-btn v-on="data.on>\'', this);
+        }
     },
 
     methods: {
@@ -172,7 +180,7 @@ exports.default = {
                     _this2.runDelay('close');
                 }
             };
-            if (this.$scopedSlots.activator && this.$scopedSlots.activator.length) {
+            if ((0, _helpers.getSlotType)(this, 'activator') === 'scoped') {
                 var activator = this.$scopedSlots.activator({ on: listeners });
                 this.activatorNode = activator;
                 return activator;

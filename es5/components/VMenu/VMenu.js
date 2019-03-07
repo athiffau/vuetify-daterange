@@ -68,15 +68,13 @@ var _ThemeProvider = require('../../util/ThemeProvider');
 
 var _ThemeProvider2 = _interopRequireDefault(_ThemeProvider);
 
+var _console = require('../../util/console');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* @vue/component */
 
-// Helpers
-
-// Directives
-
-// Component level mixins
+// Mixins
 exports.default = _vue2.default.extend({
     name: 'v-menu',
     provide: function provide() {
@@ -130,8 +128,9 @@ exports.default = _vue2.default.extend({
 
     computed: {
         calculatedLeft: function calculatedLeft() {
-            if (!this.auto) return this.calcLeft();
-            return this.calcXOverflow(this.calcLeftAuto()) + 'px';
+            var menuWidth = Math.max(this.dimensions.content.width, parseFloat(this.calculatedMinWidth));
+            if (!this.auto) return this.calcLeft(menuWidth);
+            return this.calcXOverflow(this.calcLeftAuto(), menuWidth) + 'px';
         },
         calculatedMaxHeight: function calculatedMaxHeight() {
             return this.auto ? '200px' : (0, _helpers.convertToUnit)(this.maxHeight);
@@ -143,7 +142,7 @@ exports.default = _vue2.default.extend({
             if (this.minWidth) {
                 return isNaN(this.minWidth) ? this.minWidth : this.minWidth + 'px';
             }
-            var minWidth = this.dimensions.activator.width + this.nudgeWidth + (this.auto ? 16 : 0);
+            var minWidth = Math.min(this.dimensions.activator.width + this.nudgeWidth + (this.auto ? 16 : 0), Math.max(this.pageWidth - 24, 0));
             var calculatedMaxWidth = isNaN(parseInt(this.calculatedMaxWidth)) ? minWidth : parseInt(this.calculatedMaxWidth);
             return Math.min(calculatedMaxWidth, minWidth) + 'px';
         },
@@ -182,6 +181,9 @@ exports.default = _vue2.default.extend({
     },
     mounted: function mounted() {
         this.isActive && this.activate();
+        if ((0, _helpers.getSlotType)(this, 'activator', true) === 'v-slot') {
+            (0, _console.consoleError)('v-tooltip\'s activator slot must be bound, try \'<template #activator="data"><v-btn v-on="data.on>\'', this);
+        }
     },
 
     methods: {
@@ -246,5 +248,9 @@ exports.default = _vue2.default.extend({
         }, [this.genTransition()])]);
     }
 });
-// Mixins
+// Helpers
+
+// Directives
+
+// Component level mixins
 //# sourceMappingURL=VMenu.js.map

@@ -30,6 +30,7 @@ exports.remapInternalIcon = remapInternalIcon;
 exports.keys = keys;
 exports.arrayDiff = arrayDiff;
 exports.upperFirst = upperFirst;
+exports.getSlotType = getSlotType;
 
 var _vue = require('vue');
 
@@ -323,5 +324,18 @@ function arrayDiff(a, b) {
  */
 function upperFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+/**
+ * Returns:
+ *  - 'normal' for old style slots - `<template slot="default">`
+ *  - 'scoped' for old style scoped slots (`<template slot="default" slot-scope="data">`) or bound v-slot (`#default="data"`)
+ *  - 'v-slot' for unbound v-slot (`#default`) - only if the third param is true, otherwise counts as scoped
+ */
+function getSlotType(vm, name, split) {
+    if (vm.$slots[name] && vm.$scopedSlots[name] && vm.$scopedSlots[name].name) {
+        return split ? 'v-slot' : 'scoped';
+    }
+    if (vm.$slots[name]) return 'normal';
+    if (vm.$scopedSlots[name]) return 'scoped';
 }
 //# sourceMappingURL=helpers.js.map

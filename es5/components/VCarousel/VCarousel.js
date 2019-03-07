@@ -70,7 +70,7 @@ exports.default = _VWindow2.default.extend({
     },
     data: function data() {
         return {
-            changedByControls: false,
+            changedByDelimiters: false,
             internalHeight: this.height,
             slideTimeout: undefined
         };
@@ -120,13 +120,23 @@ exports.default = _VWindow2.default.extend({
             }, [this.genItems()]);
         },
         genIcon: function genIcon(direction, icon, fn) {
+            var _this = this;
+
             return this.$createElement('div', {
                 staticClass: 'v-carousel__' + direction
             }, [this.$createElement(_VBtn2.default, {
                 props: {
                     icon: true
                 },
-                on: { click: fn }
+                attrs: {
+                    'aria-label': this.$vuetify.t('$vuetify.carousel.' + direction)
+                },
+                on: {
+                    click: function click() {
+                        _this.changedByDelimiters = true;
+                        fn();
+                    }
+                }
             }, [this.$createElement(_VIcon2.default, {
                 props: { 'size': '46px' }
             }, icon)])]);
@@ -144,7 +154,7 @@ exports.default = _VWindow2.default.extend({
             return icons;
         },
         genItems: function genItems() {
-            var _this = this;
+            var _this2 = this;
 
             var length = this.items.length;
             var children = [];
@@ -169,8 +179,7 @@ exports.default = _VWindow2.default.extend({
                 },
                 on: {
                     change: function change(val) {
-                        _this.changedByControls = true;
-                        _this.internalValue = val;
+                        _this2.internalValue = val;
                     }
                 }
             }, children);
@@ -186,10 +195,11 @@ exports.default = _VWindow2.default.extend({
             this.slideTimeout = window.setTimeout(this.next, +this.interval > 0 ? +this.interval : 6000);
         },
         updateReverse: function updateReverse(val, oldVal) {
-            if (this.changedByControls) {
-                this.changedByControls = false;
-                _VWindow2.default.options.methods.updateReverse.call(this, val, oldVal);
+            if (this.changedByDelimiters) {
+                this.changedByDelimiters = false;
+                return;
             }
+            _VWindow2.default.options.methods.updateReverse.call(this, val, oldVal);
         }
     },
     render: function render(h) {

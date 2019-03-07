@@ -606,6 +606,9 @@ var defaultMenuProps = __assign({}, _VSelect_VSelect__WEBPACK_IMPORTED_MODULE_1_
         },
         internalSearch: function internalSearch(val) {
             this.onInternalSearchChanged(val);
+        },
+        itemText: function itemText() {
+            this.updateSelf();
         }
     },
     created: function created() {
@@ -1187,9 +1190,11 @@ var __assign = undefined && undefined.__assign || function () {
         genItems: function genItems() {
             var items = [];
             var hasSlot = !!this.$scopedSlots.item;
+            var keys = [];
             for (var i = 0; i < this.items.length; i++) {
                 var item = this.items[i];
-                if (hasSlot) items.push(this.$scopedSlots.item({ item: item }));else items.push(this.$createElement(___WEBPACK_IMPORTED_MODULE_1__["VBreadcrumbsItem"], { key: item.text, props: item }, [item.text]));
+                keys.push(item.text);
+                if (hasSlot) items.push(this.$scopedSlots.item({ item: item }));else items.push(this.$createElement(___WEBPACK_IMPORTED_MODULE_1__["VBreadcrumbsItem"], { key: keys.join('.'), props: item }, [item.text]));
                 if (i < this.items.length - 1) items.push(this.genDivider());
             }
             return items;
@@ -1567,8 +1572,8 @@ var __assign = undefined && undefined.__assign || function () {
             switch (this.type) {
                 case 'month':
                     component = _VCalendarMonthly__WEBPACK_IMPORTED_MODULE_3__["default"];
-                    start = this.getStartOfMonth(around);
-                    end = this.getEndOfMonth(around);
+                    start = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["getStartOfMonth"])(around);
+                    end = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["getEndOfMonth"])(around);
                     break;
                 case 'week':
                     component = _VCalendarDaily__WEBPACK_IMPORTED_MODULE_4__["default"];
@@ -1698,7 +1703,7 @@ var __assign = undefined && undefined.__assign || function () {
             props: __assign({}, this.$props, { start: start.date, end: end.date, maxDays: maxDays }),
             on: __assign({}, this.$listeners, { 'click:date': function clickDate(day) {
                     if (_this.$listeners['input']) {
-                        _this.$emit('input', day);
+                        _this.$emit('input', day.date);
                     }
                     if (_this.$listeners['click:date']) {
                         _this.$emit('click:date', day);
@@ -1980,10 +1985,10 @@ __webpack_require__.r(__webpack_exports__);
             return 'v-calendar-monthly v-calendar-weekly';
         },
         parsedStart: function parsedStart() {
-            return this.getStartOfMonth(Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["parseTimestamp"])(this.start));
+            return Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["getStartOfMonth"])(Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["parseTimestamp"])(this.start));
         },
         parsedEnd: function parsedEnd() {
-            return this.getEndOfMonth(Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["parseTimestamp"])(this.end));
+            return Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["getEndOfMonth"])(Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_2__["parseTimestamp"])(this.end));
         }
     }
 }));
@@ -2286,32 +2291,10 @@ __webpack_require__.r(__webpack_exports__);
             };
         },
         getStartOfWeek: function getStartOfWeek(timestamp) {
-            var start = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["copyTimestamp"])(timestamp);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["findWeekday"])(start, this.weekdays[0], _util_timestamp__WEBPACK_IMPORTED_MODULE_6__["prevDay"]);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateFormatted"])(start);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateRelative"])(start, this.times.today, start.hasTime);
-            return start;
+            return Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["getStartOfWeek"])(timestamp, this.weekdays, this.times.today);
         },
         getEndOfWeek: function getEndOfWeek(timestamp) {
-            var end = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["copyTimestamp"])(timestamp);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["findWeekday"])(end, this.weekdays[this.weekdays.length - 1]);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateFormatted"])(end);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateRelative"])(end, this.times.today, end.hasTime);
-            return end;
-        },
-        getStartOfMonth: function getStartOfMonth(timestamp) {
-            var start = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["copyTimestamp"])(timestamp);
-            start.day = _util_timestamp__WEBPACK_IMPORTED_MODULE_6__["DAY_MIN"];
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateWeekday"])(start);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateFormatted"])(start);
-            return start;
-        },
-        getEndOfMonth: function getEndOfMonth(timestamp) {
-            var end = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["copyTimestamp"])(timestamp);
-            end.day = Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["daysInMonth"])(end.year, end.month);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateWeekday"])(end);
-            Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["updateFormatted"])(end);
-            return end;
+            return Object(_util_timestamp__WEBPACK_IMPORTED_MODULE_6__["getEndOfWeek"])(timestamp, this.weekdays, this.times.today);
         }
     }
 }));
@@ -2723,7 +2706,7 @@ function validateNumber(input) {
 /*!****************************************************!*\
   !*** ./src/components/VCalendar/util/timestamp.ts ***!
   \****************************************************/
-/*! exports provided: PARSE_REGEX, PARSE_TIME, DAYS_IN_MONTH, DAYS_IN_MONTH_LEAP, DAYS_IN_MONTH_MIN, DAYS_IN_MONTH_MAX, MONTH_MAX, MONTH_MIN, DAY_MIN, DAYS_IN_WEEK, MINUTES_IN_HOUR, HOURS_IN_DAY, FIRST_HOUR, parseTime, validateTimestamp, parseTimestamp, parseDate, getDayIdentifier, getTimeIdentifier, updateRelative, updateMinutes, updateWeekday, updateFormatted, getWeekday, isLeapYear, daysInMonth, copyTimestamp, padNumber, getDate, getTime, nextMinutes, nextDay, prevDay, relativeDays, findWeekday, getWeekdaySkips, createDayList, createIntervalList, createNativeLocaleFormatter */
+/*! exports provided: PARSE_REGEX, PARSE_TIME, DAYS_IN_MONTH, DAYS_IN_MONTH_LEAP, DAYS_IN_MONTH_MIN, DAYS_IN_MONTH_MAX, MONTH_MAX, MONTH_MIN, DAY_MIN, DAYS_IN_WEEK, MINUTES_IN_HOUR, HOURS_IN_DAY, FIRST_HOUR, getStartOfWeek, getEndOfWeek, getStartOfMonth, getEndOfMonth, parseTime, validateTimestamp, parseTimestamp, parseDate, getDayIdentifier, getTimeIdentifier, updateRelative, updateMinutes, updateWeekday, updateFormatted, getWeekday, isLeapYear, daysInMonth, copyTimestamp, padNumber, getDate, getTime, nextMinutes, nextDay, prevDay, relativeDays, findWeekday, getWeekdaySkips, createDayList, createIntervalList, createNativeLocaleFormatter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2741,6 +2724,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MINUTES_IN_HOUR", function() { return MINUTES_IN_HOUR; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOURS_IN_DAY", function() { return HOURS_IN_DAY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FIRST_HOUR", function() { return FIRST_HOUR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getStartOfWeek", function() { return getStartOfWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getEndOfWeek", function() { return getEndOfWeek; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getStartOfMonth", function() { return getStartOfMonth; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getEndOfMonth", function() { return getEndOfMonth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseTime", function() { return parseTime; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validateTimestamp", function() { return validateTimestamp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseTimestamp", function() { return parseTimestamp; });
@@ -2769,8 +2756,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createNativeLocaleFormatter", function() { return createNativeLocaleFormatter; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var PARSE_REGEX = /^(\d{1,4})-(\d{1,2})(-(\d{1,2}))?([^\d]+(\d{1,2}))?(:(\d{1,2}))?(:(\d{1,2}))?$/;
-var PARSE_TIME = /(\d{1,2})?(:(\d{1,2}))?(:(\d{1,2}))/;
+var PARSE_REGEX = /^(\d{4})-(\d{1,2})(-(\d{1,2}))?([^\d]+(\d{1,2}))?(:(\d{1,2}))?(:(\d{1,2}))?$/;
+var PARSE_TIME = /(\d\d?)(:(\d\d?)|)(:(\d\d?)|)/;
 var DAYS_IN_MONTH = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var DAYS_IN_MONTH_LEAP = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 var DAYS_IN_MONTH_MIN = 28;
@@ -2782,6 +2769,38 @@ var DAYS_IN_WEEK = 7;
 var MINUTES_IN_HOUR = 60;
 var HOURS_IN_DAY = 24;
 var FIRST_HOUR = 0;
+function getStartOfWeek(timestamp, weekdays, today) {
+    var start = copyTimestamp(timestamp);
+    findWeekday(start, weekdays[0], prevDay);
+    updateFormatted(start);
+    if (today) {
+        updateRelative(start, today, start.hasTime);
+    }
+    return start;
+}
+function getEndOfWeek(timestamp, weekdays, today) {
+    var end = copyTimestamp(timestamp);
+    findWeekday(end, weekdays[weekdays.length - 1]);
+    updateFormatted(end);
+    if (today) {
+        updateRelative(end, today, end.hasTime);
+    }
+    return end;
+}
+function getStartOfMonth(timestamp) {
+    var start = copyTimestamp(timestamp);
+    start.day = DAY_MIN;
+    updateWeekday(start);
+    updateFormatted(start);
+    return start;
+}
+function getEndOfMonth(timestamp) {
+    var end = copyTimestamp(timestamp);
+    end.day = daysInMonth(end.year, end.month);
+    updateWeekday(end);
+    updateFormatted(end);
+    return end;
+}
 function parseTime(input) {
     if (typeof input === 'number') {
         // when a number is given, it's minutes since 12:00am
@@ -2792,7 +2811,7 @@ function parseTime(input) {
         if (!parts) {
             return false;
         }
-        return parseInt(parts[1]) * 60 + parseInt(parts[2] || 0);
+        return parseInt(parts[1]) * 60 + parseInt(parts[3] || 0);
     } else if ((typeof input === 'undefined' ? 'undefined' : _typeof(input)) === 'object') {
         // when an object is given, it must have hour and minute
         if (typeof input.hour !== 'number' || typeof input.minute !== 'number') {
@@ -2851,7 +2870,7 @@ function parseDate(date) {
     });
 }
 function getDayIdentifier(timestamp) {
-    return timestamp.year * 1000000 + timestamp.month * 100 + timestamp.day;
+    return timestamp.year * 10000 + timestamp.month * 100 + timestamp.day;
 }
 function getTimeIdentifier(timestamp) {
     return timestamp.hour * 100 + timestamp.minute;
@@ -2899,7 +2918,7 @@ function getWeekday(timestamp) {
         var m = (timestamp.month + 9) % MONTH_MAX + 1;
         var C = _(timestamp.year / 100);
         var Y = timestamp.year % 100 - (timestamp.month <= 2 ? 1 : 0);
-        return (k + _(2.6 * m - 0.2) - 2 * C + Y + _(Y / 4) + _(C / 4)) % 7;
+        return ((k + _(2.6 * m - 0.2) - 2 * C + Y + _(Y / 4) + _(C / 4)) % 7 + 7) % 7;
     }
     return timestamp.weekday;
 }
@@ -3315,7 +3334,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     data: function data() {
         return {
-            changedByControls: false,
+            changedByDelimiters: false,
             internalHeight: this.height,
             slideTimeout: undefined
         };
@@ -3362,13 +3381,22 @@ __webpack_require__.r(__webpack_exports__);
             }, [this.genItems()]);
         },
         genIcon: function genIcon(direction, icon, fn) {
+            var _this = this;
             return this.$createElement('div', {
                 staticClass: "v-carousel__" + direction
             }, [this.$createElement(_VBtn__WEBPACK_IMPORTED_MODULE_2__["default"], {
                 props: {
                     icon: true
                 },
-                on: { click: fn }
+                attrs: {
+                    'aria-label': this.$vuetify.t("$vuetify.carousel." + direction)
+                },
+                on: {
+                    click: function click() {
+                        _this.changedByDelimiters = true;
+                        fn();
+                    }
+                }
             }, [this.$createElement(_VIcon__WEBPACK_IMPORTED_MODULE_3__["default"], {
                 props: { 'size': '46px' }
             }, icon)])]);
@@ -3410,7 +3438,6 @@ __webpack_require__.r(__webpack_exports__);
                 },
                 on: {
                     change: function change(val) {
-                        _this.changedByControls = true;
                         _this.internalValue = val;
                     }
                 }
@@ -3427,10 +3454,11 @@ __webpack_require__.r(__webpack_exports__);
             this.slideTimeout = window.setTimeout(this.next, +this.interval > 0 ? +this.interval : 6000);
         },
         updateReverse: function updateReverse(val, oldVal) {
-            if (this.changedByControls) {
-                this.changedByControls = false;
-                _VWindow_VWindow__WEBPACK_IMPORTED_MODULE_1__["default"].options.methods.updateReverse.call(this, val, oldVal);
+            if (this.changedByDelimiters) {
+                this.changedByDelimiters = false;
+                return;
             }
+            _VWindow_VWindow__WEBPACK_IMPORTED_MODULE_1__["default"].options.methods.updateReverse.call(this, val, oldVal);
         }
     },
     render: function render(h) {
@@ -6416,6 +6444,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _directives_click_outside__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../directives/click-outside */ "./src/directives/click-outside.ts");
 /* harmony import */ var _util_helpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../util/helpers */ "./src/util/helpers.ts");
 /* harmony import */ var _util_ThemeProvider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../util/ThemeProvider */ "./src/util/ThemeProvider.ts");
+/* harmony import */ var _util_console__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../util/console */ "./src/util/console.ts");
 var __assign = undefined && undefined.__assign || function () {
     __assign = Object.assign || function (t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -6439,6 +6468,7 @@ var __assign = undefined && undefined.__assign || function () {
 // Directives
 
 // Helpers
+
 
 
 /* @vue/component */
@@ -6525,6 +6555,11 @@ var __assign = undefined && undefined.__assign || function () {
             _this.isActive && _this.show();
         });
     },
+    mounted: function mounted() {
+        if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_8__["getSlotType"])(this, 'activator', true) === 'v-slot') {
+            Object(_util_console__WEBPACK_IMPORTED_MODULE_10__["consoleError"])("v-dialog's activator slot must be bound, try '<template #activator=\"data\"><v-btn v-on=\"data.on>'", this);
+        }
+    },
     beforeDestroy: function beforeDestroy() {
         if (typeof window !== 'undefined') this.unbind();
     },
@@ -6588,7 +6623,7 @@ var __assign = undefined && undefined.__assign || function () {
                     if (!_this.disabled) _this.isActive = !_this.isActive;
                 }
             };
-            if (this.$scopedSlots.activator && this.$scopedSlots.activator.length) {
+            if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_8__["getSlotType"])(this, 'activator') === 'scoped') {
                 var activator = this.$scopedSlots.activator({ on: listeners });
                 this.activatorNode = activator;
                 return activator;
@@ -7715,7 +7750,7 @@ var VIcon = Object(_util_mixins__WEBPACK_IMPORTED_MODULE_6__["default"])(_mixins
     methods: {
         getIcon: function getIcon() {
             var iconName = '';
-            if (this.$slots.default) iconName = this.$slots.default[0].text;
+            if (this.$slots.default) iconName = this.$slots.default[0].text.trim();
             return Object(_util_helpers__WEBPACK_IMPORTED_MODULE_4__["remapInternalIcon"])(this, iconName);
         },
         getSize: function getSize() {
@@ -7784,6 +7819,7 @@ var VIcon = Object(_util_mixins__WEBPACK_IMPORTED_MODULE_6__["default"])(_mixins
             this.applyColors(data);
             var component = icon.component;
             data.props = icon.props;
+            data.nativeOn = data.on;
             return h(component, data);
         }
     },
@@ -9372,6 +9408,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _directives_resize__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../directives/resize */ "./src/directives/resize.ts");
 /* harmony import */ var _util_helpers__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../util/helpers */ "./src/util/helpers.ts");
 /* harmony import */ var _util_ThemeProvider__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../util/ThemeProvider */ "./src/util/ThemeProvider.ts");
+/* harmony import */ var _util_console__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../util/console */ "./src/util/console.ts");
 
 
 // Mixins
@@ -9391,6 +9428,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Helpers
+
 
 
 /* @vue/component */
@@ -9445,8 +9483,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     computed: {
         calculatedLeft: function calculatedLeft() {
-            if (!this.auto) return this.calcLeft();
-            return this.calcXOverflow(this.calcLeftAuto()) + "px";
+            var menuWidth = Math.max(this.dimensions.content.width, parseFloat(this.calculatedMinWidth));
+            if (!this.auto) return this.calcLeft(menuWidth);
+            return this.calcXOverflow(this.calcLeftAuto(), menuWidth) + "px";
         },
         calculatedMaxHeight: function calculatedMaxHeight() {
             return this.auto ? '200px' : Object(_util_helpers__WEBPACK_IMPORTED_MODULE_15__["convertToUnit"])(this.maxHeight);
@@ -9458,7 +9497,7 @@ __webpack_require__.r(__webpack_exports__);
             if (this.minWidth) {
                 return isNaN(this.minWidth) ? this.minWidth : this.minWidth + "px";
             }
-            var minWidth = this.dimensions.activator.width + this.nudgeWidth + (this.auto ? 16 : 0);
+            var minWidth = Math.min(this.dimensions.activator.width + this.nudgeWidth + (this.auto ? 16 : 0), Math.max(this.pageWidth - 24, 0));
             var calculatedMaxWidth = isNaN(parseInt(this.calculatedMaxWidth)) ? minWidth : parseInt(this.calculatedMaxWidth);
             return Math.min(calculatedMaxWidth, minWidth) + "px";
         },
@@ -9497,6 +9536,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     mounted: function mounted() {
         this.isActive && this.activate();
+        if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_15__["getSlotType"])(this, 'activator', true) === 'v-slot') {
+            Object(_util_console__WEBPACK_IMPORTED_MODULE_17__["consoleError"])("v-tooltip's activator slot must be bound, try '<template #activator=\"data\"><v-btn v-on=\"data.on>'", this);
+        }
     },
     methods: {
         activate: function activate() {
@@ -9658,6 +9700,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _util_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/helpers */ "./src/util/helpers.ts");
 var __assign = undefined && undefined.__assign || function () {
     __assign = Object.assign || function (t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9697,6 +9740,7 @@ var __spread = undefined && undefined.__spread || function () {
         ar = ar.concat(__read(arguments[i]));
     }return ar;
 };
+
 /* @vue/component */
 /* harmony default export */ __webpack_exports__["default"] = ({
     methods: {
@@ -9711,7 +9755,8 @@ var __spread = undefined && undefined.__spread || function () {
                     listeners.click = this.activatorClickHandler;
                 }
             }
-            if (this.$scopedSlots.activator && this.$scopedSlots.activator.length) {
+            if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_0__["getSlotType"])(this, 'activator') === 'scoped') {
+                listeners.keydown = this.onKeyDown;
                 var activator = this.$scopedSlots.activator({ on: listeners });
                 this.activatorNode = activator;
                 return activator;
@@ -12754,8 +12799,9 @@ var defaultMenuProps = {
             this.selectedItems = selectedItems;
         },
         setValue: function setValue(value) {
-            value !== this.internalValue && this.$emit('change', value);
+            var oldValue = this.internalValue;
             this.internalValue = value;
+            value !== oldValue && this.$emit('change', value);
         }
     }
 }));
@@ -13159,7 +13205,8 @@ var __assign = undefined && undefined.__assign || function () {
     render: function render(h) {
         var data = {
             class: this.classes,
-            style: this.styles
+            style: this.styles,
+            on: this.$listeners
         };
         return h(this.tag, this.setBackgroundColor(this.color, data), this.$slots.default);
     }
@@ -13638,7 +13685,7 @@ var __assign = undefined && undefined.__assign || function () {
             var decimals = trimmedStep.indexOf('.') > -1 ? trimmedStep.length - trimmedStep.indexOf('.') - 1 : 0;
             var offset = this.min % this.stepNumeric;
             var newValue = Math.round((value - offset) / this.stepNumeric) * this.stepNumeric + offset;
-            return parseFloat(Math.min(newValue, this.max).toFixed(decimals));
+            return parseFloat(Math.max(Math.min(newValue, this.max), this.min).toFixed(decimals));
         },
         setInternalValue: function setInternalValue(value) {
             this.internalValue = value;
@@ -13817,6 +13864,10 @@ var __assign = undefined && undefined.__assign || function () {
             type: String,
             default: 'ease'
         },
+        autoLineWidth: {
+            type: Boolean,
+            default: false
+        },
         color: {
             type: String,
             default: 'primary'
@@ -13877,6 +13928,10 @@ var __assign = undefined && undefined.__assign || function () {
         width: {
             type: [Number, String],
             default: 300
+        },
+        labelSize: {
+            type: [Number, String],
+            default: 7
         }
     },
     data: function data() {
@@ -13885,15 +13940,30 @@ var __assign = undefined && undefined.__assign || function () {
         };
     },
     computed: {
+        parsedPadding: function parsedPadding() {
+            return Number(this.padding);
+        },
+        parsedWidth: function parsedWidth() {
+            return Number(this.width);
+        },
+        totalBars: function totalBars() {
+            return this.value.length;
+        },
+        _lineWidth: function _lineWidth() {
+            if (this.autoLineWidth && this.type !== 'trend') {
+                var totalPadding = this.parsedPadding * (this.totalBars + 1);
+                return (this.parsedWidth - totalPadding) / this.totalBars;
+            } else {
+                return Number(this.lineWidth) || 4;
+            }
+        },
         boundary: function boundary() {
-            var padding = Number(this.padding);
             var height = Number(this.height);
-            var width = Number(this.width);
             return {
-                minX: padding,
-                minY: padding,
-                maxX: width - padding,
-                maxY: height - padding
+                minX: this.parsedPadding,
+                minY: this.parsedPadding,
+                maxX: this.parsedWidth - this.parsedPadding,
+                maxY: height - this.parsedPadding
             };
         },
         hasLabels: function hasLabels() {
@@ -13914,7 +13984,7 @@ var __assign = undefined && undefined.__assign || function () {
             return labels;
         },
         points: function points() {
-            return Object(_helpers_core__WEBPACK_IMPORTED_MODULE_2__["genPoints"])(this.value.slice(), this.boundary);
+            return Object(_helpers_core__WEBPACK_IMPORTED_MODULE_2__["genPoints"])(this.value.slice(), this.boundary, this.type);
         },
         textY: function textY() {
             return this.boundary.maxY + 6;
@@ -14012,33 +14082,36 @@ var __assign = undefined && undefined.__assign || function () {
             }, [children]);
         },
         genBar: function genBar() {
-            if (!this.value || this.value.length < 2) return undefined;
+            if (!this.value || this.totalBars < 2) return undefined;
             var _a = this,
                 width = _a.width,
                 height = _a.height,
-                padding = _a.padding,
-                lineWidth = _a.lineWidth;
-            var viewWidth = width || this.value.length * Number(padding) * 2;
+                parsedPadding = _a.parsedPadding,
+                _lineWidth = _a._lineWidth;
+            var viewWidth = width || this.totalBars * parsedPadding * 2;
             var viewHeight = height || 75;
             var boundary = {
-                minX: Number(padding),
-                minY: Number(padding),
-                maxX: Number(viewWidth) - Number(padding),
-                maxY: Number(viewHeight) - Number(padding)
+                minX: parsedPadding,
+                minY: parsedPadding,
+                maxX: Number(viewWidth) - parsedPadding,
+                maxY: Number(viewHeight) - parsedPadding
             };
             var props = __assign({}, this.$props);
-            props.points = Object(_helpers_core__WEBPACK_IMPORTED_MODULE_2__["genPoints"])(this.value, boundary);
+            props.points = Object(_helpers_core__WEBPACK_IMPORTED_MODULE_2__["genPoints"])(this.value, boundary, this.type);
             var totalWidth = boundary.maxX / (props.points.length - 1);
             props.boundary = boundary;
-            props.lineWidth = lineWidth || totalWidth - Number(padding || 5);
-            props.offsetX = (totalWidth - props.lineWidth) / 2;
+            props.lineWidth = _lineWidth || totalWidth - Number(parsedPadding || 5);
+            props.offsetX = 0;
+            if (!this.autoLineWidth) {
+                props.offsetX = boundary.maxX / this.totalBars / 2 - boundary.minX;
+            }
             return this.$createElement('svg', {
                 attrs: {
                     width: '100%',
                     height: '25%',
                     viewBox: "0 0 " + viewWidth + " " + viewHeight
                 }
-            }, [this.genGradient(), this.genClipPath(props.offsetX, 'sparkline-bar-' + this._uid), this.showLabels ? this.genBarLabels(props) : undefined, this.$createElement('g', {
+            }, [this.genGradient(), this.genClipPath(props.offsetX, props.lineWidth, 'sparkline-bar-' + this._uid), this.hasLabels ? this.genBarLabels(props) : undefined, this.$createElement('g', {
                 attrs: {
                     transform: "scale(1,-1) translate(0,-" + boundary.maxY + ")",
                     'clip-path': "url(#sparkline-bar-" + this._uid + "-clip)",
@@ -14053,7 +14126,7 @@ var __assign = undefined && undefined.__assign || function () {
                 }
             })])]);
         },
-        genClipPath: function genClipPath(offsetX, id) {
+        genClipPath: function genClipPath(offsetX, lineWidth, id) {
             var _this = this;
             var maxY = this.boundary.maxY;
             var rounding = typeof this.smooth === 'number' ? this.smooth : this.smooth ? 2 : 0;
@@ -14064,9 +14137,9 @@ var __assign = undefined && undefined.__assign || function () {
             }, this.points.map(function (item) {
                 return _this.$createElement('rect', {
                     attrs: {
-                        x: item.x - offsetX,
+                        x: item.x + offsetX,
                         y: 0,
-                        width: _this.lineWidth,
+                        width: lineWidth,
                         height: Math.max(maxY - item.y, 0),
                         rx: rounding,
                         ry: rounding
@@ -14084,12 +14157,13 @@ var __assign = undefined && undefined.__assign || function () {
         },
         genBarLabels: function genBarLabels(props) {
             var _this = this;
-            var offsetX = (props.offsetX || 0) / 2;
+            var offsetX = props.offsetX || 0;
             var children = props.points.map(function (item) {
                 return _this.$createElement('text', {
                     attrs: {
-                        x: item.x - offsetX * -0.45 - 10,
-                        y: props.boundary.maxY + 10
+                        x: item.x + offsetX + _this._lineWidth / 2,
+                        y: props.boundary.maxY + (Number(_this.labelSize) || 7),
+                        'font-size': Number(_this.labelSize) || 7
                     }
                 }, item.value.toString());
             });
@@ -14098,7 +14172,7 @@ var __assign = undefined && undefined.__assign || function () {
         genTrend: function genTrend() {
             return this.$createElement('svg', this.setTextColor(this.color, {
                 attrs: {
-                    'stroke-width': this.lineWidth || 1,
+                    'stroke-width': this._lineWidth || 1,
                     width: '100%',
                     height: '25%',
                     viewBox: "0 0 " + this.width + " " + this.height
@@ -14107,7 +14181,7 @@ var __assign = undefined && undefined.__assign || function () {
         }
     },
     render: function render(h) {
-        if (this.value.length < 2) return undefined;
+        if (this.totalBars < 2) return undefined;
         return this.type === 'trend' ? this.genTrend() : this.genBar();
     }
 }));
@@ -14151,7 +14225,7 @@ var __spread = undefined && undefined.__spread || function () {
         ar = ar.concat(__read(arguments[i]));
     }return ar;
 };
-function genPoints(points, boundary) {
+function genPoints(points, boundary, type) {
     var minX = boundary.minX,
         minY = boundary.minY,
         maxX = boundary.maxX,
@@ -14159,15 +14233,17 @@ function genPoints(points, boundary) {
     var normalisedPoints = points.map(function (item) {
         return typeof item === 'number' ? item : item.value;
     });
+    var totalPoints = normalisedPoints.length;
     var maxValue = Math.max.apply(Math, __spread(normalisedPoints)) + 1;
     var minValue = Math.min.apply(Math, __spread(normalisedPoints));
     if (minValue) minValue -= 1;
-    var gridX = (maxX - minX) / (normalisedPoints.length - 1);
+    var gridX = (maxX - minX) / (totalPoints - 1);
+    if (type === 'bar') gridX = maxX / totalPoints;
     var gridY = (maxY - minY) / (maxValue - minValue);
     return normalisedPoints.map(function (value, index) {
         return {
-            x: index * gridX + minX,
-            y: maxY - (value - minValue) * gridY + +(index === normalisedPoints.length - 1) * 0.00001 - +(index === 0) * 0.00001,
+            x: minX + index * gridX,
+            y: maxY - (value - minValue) * gridY + +(index === totalPoints - 1) * 0.00001 - +(index === 0) * 0.00001,
             value: value
         };
     });
@@ -14352,9 +14428,20 @@ __webpack_require__.r(__webpack_exports__);
             };
         }
         if (this.isActive) {
+            var btnCount_1 = 0;
             children = (this.$slots.default || []).map(function (b, i) {
-                b.key = i;
-                return b;
+                if (b.tag && b.componentOptions.Ctor.options.name === 'v-btn') {
+                    btnCount_1++;
+                    return h('div', {
+                        style: {
+                            transitionDelay: btnCount_1 * 0.05 + 's'
+                        },
+                        key: i
+                    }, [b]);
+                } else {
+                    b.key = i;
+                    return b;
+                }
             });
         }
         var list = h('transition-group', {
@@ -16948,7 +17035,7 @@ var __assign = undefined && undefined.__assign || function () {
     methods: {
         wheel: function wheel(e) {
             e.preventDefault();
-            var delta = Math.sign(e.wheelDelta || 1);
+            var delta = Math.sign(-e.deltaY || 1);
             var value = this.displayedValue;
             do {
                 value = value + delta;
@@ -17714,6 +17801,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mixins_menuable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../mixins/menuable */ "./src/mixins/menuable.js");
 /* harmony import */ var _mixins_toggleable__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../mixins/toggleable */ "./src/mixins/toggleable.ts");
 /* harmony import */ var _util_helpers__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../util/helpers */ "./src/util/helpers.ts");
+/* harmony import */ var _util_console__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../util/console */ "./src/util/console.ts");
 
 // Mixins
 
@@ -17723,6 +17811,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Helpers
+
 
 /* @vue/component */
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -17776,7 +17865,7 @@ __webpack_require__.r(__webpack_exports__);
             }
             if (this.nudgeLeft) left -= parseInt(this.nudgeLeft);
             if (this.nudgeRight) left += parseInt(this.nudgeRight);
-            return this.calcXOverflow(left) + "px";
+            return this.calcXOverflow(left, this.dimensions.content.width) + "px";
         },
         calculatedTop: function calculatedTop() {
             var _a = this.dimensions,
@@ -17819,6 +17908,7 @@ __webpack_require__.r(__webpack_exports__);
             return {
                 left: this.calculatedLeft,
                 maxWidth: Object(_util_helpers__WEBPACK_IMPORTED_MODULE_7__["convertToUnit"])(this.maxWidth),
+                minWidth: Object(_util_helpers__WEBPACK_IMPORTED_MODULE_7__["convertToUnit"])(this.minWidth),
                 opacity: this.isActive ? 0.9 : 0,
                 top: this.calculatedTop,
                 zIndex: this.zIndex || this.activeZIndex
@@ -17830,6 +17920,11 @@ __webpack_require__.r(__webpack_exports__);
         this.$nextTick(function () {
             _this.value && _this.callActivate();
         });
+    },
+    mounted: function mounted() {
+        if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_7__["getSlotType"])(this, 'activator', true) === 'v-slot') {
+            Object(_util_console__WEBPACK_IMPORTED_MODULE_8__["consoleError"])("v-tooltip's activator slot must be bound, try '<template #activator=\"data\"><v-btn v-on=\"data.on>'", this);
+        }
     },
     methods: {
         activate: function activate() {
@@ -17851,7 +17946,7 @@ __webpack_require__.r(__webpack_exports__);
                     _this.runDelay('close');
                 }
             };
-            if (this.$scopedSlots.activator && this.$scopedSlots.activator.length) {
+            if (Object(_util_helpers__WEBPACK_IMPORTED_MODULE_7__["getSlotType"])(this, 'activator') === 'scoped') {
                 var activator = this.$scopedSlots.activator({ on: listeners });
                 this.activatorNode = activator;
                 return activator;
@@ -19235,7 +19330,7 @@ var Vuetify = {
             return false;
         })(opts.components);
     },
-    version: '1.5.0'
+    version: '1.5.5'
 };
 function checkVueVersion(Vue, requiredVue) {
     var vueDep = requiredVue || '^2.5.18';
@@ -20647,7 +20742,7 @@ var ripple = {
         animation.style.height = size;
         el.appendChild(container);
         var computed = window.getComputedStyle(el);
-        if (computed.position === 'static') {
+        if (computed && computed.position === 'static') {
             el.style.position = 'relative';
             el.dataset.previousPosition = 'static';
         }
@@ -20692,7 +20787,10 @@ function isRippleEnabled(value) {
 function rippleShow(e) {
     var value = {};
     var element = e.currentTarget;
-    if (!element) return;
+    if (!element || element._ripple.touched) return;
+    if (isTouchEvent(e)) {
+        element._ripple.touched = true;
+    }
     value.center = element._ripple.centered;
     if (element._ripple.class) {
         value.class = element._ripple.class;
@@ -20700,7 +20798,14 @@ function rippleShow(e) {
     ripple.show(e, element, value);
 }
 function rippleHide(e) {
-    ripple.hide(e.currentTarget);
+    var element = e.currentTarget;
+    if (!element) return;
+    window.setTimeout(function () {
+        if (element._ripple) {
+            element._ripple.touched = false;
+        }
+    });
+    ripple.hide(element);
 }
 function updateRipple(el, binding, wasEnabled) {
     var enabled = isRippleEnabled(binding.value);
@@ -20720,35 +20825,33 @@ function updateRipple(el, binding, wasEnabled) {
         el._ripple.circle = value.circle;
     }
     if (enabled && !wasEnabled) {
-        if (navigator.maxTouchPoints) {
-            el.addEventListener('touchstart', rippleShow, false);
-            el.addEventListener('touchend', rippleHide, false);
-            el.addEventListener('touchcancel', rippleHide, false);
-        } else {
-            el.addEventListener('mousedown', rippleShow, false);
-            el.addEventListener('mouseup', rippleHide, false);
-            el.addEventListener('mouseleave', rippleHide, false);
-            // Anchor tags can be dragged, causes other hides to fail - #1537
-            el.addEventListener('dragstart', rippleHide, false);
-        }
+        el.addEventListener('touchstart', rippleShow, { passive: true });
+        el.addEventListener('touchend', rippleHide, { passive: true });
+        el.addEventListener('touchcancel', rippleHide);
+        el.addEventListener('mousedown', rippleShow);
+        el.addEventListener('mouseup', rippleHide);
+        el.addEventListener('mouseleave', rippleHide);
+        // Anchor tags can be dragged, causes other hides to fail - #1537
+        el.addEventListener('dragstart', rippleHide, { passive: true });
     } else if (!enabled && wasEnabled) {
         removeListeners(el);
     }
 }
 function removeListeners(el) {
-    el.removeEventListener('mousedown', rippleShow, false);
-    el.removeEventListener('touchstart', rippleHide, false);
-    el.removeEventListener('touchend', rippleHide, false);
-    el.removeEventListener('touchcancel', rippleHide, false);
-    el.removeEventListener('mouseup', rippleHide, false);
-    el.removeEventListener('mouseleave', rippleHide, false);
-    el.removeEventListener('dragstart', rippleHide, false);
+    el.removeEventListener('mousedown', rippleShow);
+    el.removeEventListener('touchstart', rippleHide);
+    el.removeEventListener('touchend', rippleHide);
+    el.removeEventListener('touchcancel', rippleHide);
+    el.removeEventListener('mouseup', rippleHide);
+    el.removeEventListener('mouseleave', rippleHide);
+    el.removeEventListener('dragstart', rippleHide);
 }
 function directive(el, binding, node) {
     updateRipple(el, binding, false);
     // warn if an inline element is used, waiting for el to be in the DOM first
     node.context && node.context.$nextTick(function () {
-        if (window.getComputedStyle(el).display === 'inline') {
+        var computed = window.getComputedStyle(el);
+        if (computed && computed.display === 'inline') {
             var context = node.fnOptions ? [node.fnOptions, node.context] : [node.componentInstance];
             _util_console__WEBPACK_IMPORTED_MODULE_0__["consoleWarn"].apply(void 0, __spread(['v-ripple can only be used on block-level elements'], context));
         }
@@ -20952,7 +21055,7 @@ var Vuetify = {
         Vue.use(_components_Vuetify__WEBPACK_IMPORTED_MODULE_1__["default"], __assign({ components: _components__WEBPACK_IMPORTED_MODULE_2__,
             directives: _directives__WEBPACK_IMPORTED_MODULE_3__["default"] }, args));
     },
-    version: '1.5.0'
+    version: '1.5.5'
 };
 if (typeof window !== 'undefined' && window.Vue) {
     window.Vue.use(Vuetify);
@@ -20982,7 +21085,11 @@ __webpack_require__.r(__webpack_exports__);
     dataTable: {
         rowsPerPageText: 'Rows per page:'
     },
-    noDataText: 'No data available'
+    noDataText: 'No data available',
+    carousel: {
+        prev: 'Previous visual',
+        next: 'Next visual'
+    }
 });
 
 /***/ }),
@@ -21520,8 +21627,18 @@ var __spread = undefined && undefined.__spread || function () {
     },
     watch: {
         items: function items() {
+            var _this = this;
             if (this.pageStart >= this.itemsLength) {
                 this.resetPagination();
+            }
+            var newItemKeys = new Set(this.items.map(function (item) {
+                return Object(_util_helpers__WEBPACK_IMPORTED_MODULE_6__["getObjectValueByPath"])(item, _this.itemKey);
+            }));
+            var selection = this.value.filter(function (item) {
+                return newItemKeys.has(Object(_util_helpers__WEBPACK_IMPORTED_MODULE_6__["getObjectValueByPath"])(item, _this.itemKey));
+            });
+            if (selection.length !== this.value.length) {
+                this.$emit('input', selection);
             }
         },
         search: function search() {
@@ -21969,10 +22086,17 @@ function validateAttachTarget(val) {
         this.isActive = false;
     },
     beforeDestroy: function beforeDestroy() {
-        if (!this.$refs.content) return;
         // IE11 Fix
         try {
-            this.$refs.content.parentNode.removeChild(this.$refs.content);
+            if (this.$refs.content) {
+                this.$refs.content.parentNode.removeChild(this.$refs.content);
+            }
+            if (this.activatorNode) {
+                var activator = Array.isArray(this.activatorNode) ? this.activatorNode : [this.activatorNode];
+                activator.forEach(function (node) {
+                    node.elm && node.elm.parentNode.removeChild(node.elm);
+                });
+            }
         } catch (e) {
             console.log(e);
         }
@@ -22473,6 +22597,7 @@ var dimensions = {
             absoluteY: 0,
             dimensions: Object.assign({}, dimensions),
             isContentActive: false,
+            pageWidth: 0,
             pageYOffset: 0,
             stackClass: 'v-menu__content--active',
             stackMinZIndex: 6
@@ -22541,23 +22666,19 @@ var dimensions = {
             };
         },
         activate: function activate() {},
-        calcLeft: function calcLeft() {
-            return (this.isAttached ? this.computedLeft : this.calcXOverflow(this.computedLeft)) + "px";
+        calcLeft: function calcLeft(menuWidth) {
+            return (this.isAttached ? this.computedLeft : this.calcXOverflow(this.computedLeft, menuWidth)) + "px";
         },
         calcTop: function calcTop() {
             return (this.isAttached ? this.computedTop : this.calcYOverflow(this.computedTop)) + "px";
         },
-        calcXOverflow: function calcXOverflow(left) {
-            var parsedMaxWidth = isNaN(parseInt(this.maxWidth)) ? 0 : parseInt(this.maxWidth);
-            var innerWidth = this.getInnerWidth();
-            var maxWidth = Math.max(this.dimensions.content.width, parsedMaxWidth);
-            var totalWidth = left + this.dimensions.activator.width;
-            var availableWidth = totalWidth - innerWidth;
-            if ((!this.left || this.right) && availableWidth > 0) {
-                left = innerWidth - maxWidth - (innerWidth > 600 ? 30 : 12) // Account for scrollbar
-                ;
+        calcXOverflow: function calcXOverflow(left, menuWidth) {
+            var xOverflow = left + menuWidth - this.pageWidth + 12;
+            if ((!this.left || this.right) && xOverflow > 0) {
+                left = Math.max(left - xOverflow, 0);
+            } else {
+                left = Math.max(left, 12);
             }
-            if (left < 0) left = 12;
             return left + this.getOffsetLeft();
         },
         calcYOverflow: function calcYOverflow(top) {
@@ -22617,15 +22738,16 @@ var dimensions = {
                 return this.activatedBy;
             }
             if (this.activatedBy) return this.activatedBy;
+            if (this.activatorNode) {
+                var activator = Array.isArray(this.activatorNode) ? this.activatorNode[0] : this.activatorNode;
+                var el = activator && activator.elm;
+                if (el) return el;
+            }
             Object(_util_console__WEBPACK_IMPORTED_MODULE_3__["consoleError"])('No activator found');
         },
         getInnerHeight: function getInnerHeight() {
             if (!this.hasWindow) return 0;
             return window.innerHeight || document.documentElement.clientHeight;
-        },
-        getInnerWidth: function getInnerWidth() {
-            if (!this.hasWindow) return 0;
-            return window.innerWidth;
         },
         getOffsetLeft: function getOffsetLeft() {
             if (!this.hasWindow) return 0;
@@ -22683,6 +22805,7 @@ var dimensions = {
             var _this = this;
             this.checkForWindow();
             this.checkForPageYOffset();
+            this.pageWidth = document.documentElement.clientWidth;
             var dimensions = {};
             // Activator should already be shown
             if (!this.hasActivator || this.absolute) {
@@ -22842,7 +22965,7 @@ __webpack_require__.r(__webpack_exports__);
         },
         checkPath: function checkPath(e) {
             var path = e.path || this.composedPath(e);
-            var delta = e.deltaY || -e.wheelDelta;
+            var delta = e.deltaY;
             if (e.type === 'keydown' && path[0] === document.body) {
                 var dialog = this.$refs.dialog;
                 var selected = window.getSelection().anchorNode;
@@ -25269,7 +25392,7 @@ function dedupeModelListeners(data) {
 /*!*****************************!*\
   !*** ./src/util/helpers.ts ***!
   \*****************************/
-/*! exports provided: createSimpleFunctional, createSimpleTransition, createJavaScriptTransition, directiveConfig, addOnceEventListener, getNestedValue, deepEqual, getObjectValueByPath, getPropertyFromItem, createRange, getZIndex, escapeHTML, filterObjectOnKeys, filterChildren, convertToUnit, kebabCase, isObject, keyCodes, remapInternalIcon, keys, camelize, arrayDiff, upperFirst */
+/*! exports provided: createSimpleFunctional, createSimpleTransition, createJavaScriptTransition, directiveConfig, addOnceEventListener, getNestedValue, deepEqual, getObjectValueByPath, getPropertyFromItem, createRange, getZIndex, escapeHTML, filterObjectOnKeys, filterChildren, convertToUnit, kebabCase, isObject, keyCodes, remapInternalIcon, keys, camelize, arrayDiff, upperFirst, getSlotType */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -25297,6 +25420,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "camelize", function() { return camelize; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayDiff", function() { return arrayDiff; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "upperFirst", function() { return upperFirst; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getSlotType", function() { return getSlotType; });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "vue");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -25597,6 +25721,19 @@ function arrayDiff(a, b) {
  */
 function upperFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+/**
+ * Returns:
+ *  - 'normal' for old style slots - `<template slot="default">`
+ *  - 'scoped' for old style scoped slots (`<template slot="default" slot-scope="data">`) or bound v-slot (`#default="data"`)
+ *  - 'v-slot' for unbound v-slot (`#default`) - only if the third param is true, otherwise counts as scoped
+ */
+function getSlotType(vm, name, split) {
+    if (vm.$slots[name] && vm.$scopedSlots[name] && vm.$scopedSlots[name].name) {
+        return split ? 'v-slot' : 'scoped';
+    }
+    if (vm.$slots[name]) return 'normal';
+    if (vm.$scopedSlots[name]) return 'scoped';
 }
 
 /***/ }),

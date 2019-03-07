@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'Rye per bladsy:'
     },
-    noDataText: 'Geen data is beskikbaar nie'
+    noDataText: 'Geen data is beskikbaar nie',
+    carousel: {
+        prev: 'Vorige visuele',
+        next: 'Volgende visuele'
+    }
 };
 //# sourceMappingURL=af.js.map

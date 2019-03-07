@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'แถวต่อหน้า:'
     },
-    noDataText: 'ไม่มีข้อมูล'
+    noDataText: 'ไม่มีข้อมูล',
+    carousel: {
+        prev: 'ภาพก่อนหน้า',
+        next: 'ภาพต่อไป'
+    }
 };
 //# sourceMappingURL=th.js.map

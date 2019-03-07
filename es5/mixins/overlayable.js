@@ -132,7 +132,7 @@ exports.default = _vue2.default.extend().extend({
         },
         checkPath: function checkPath(e) {
             var path = e.path || this.composedPath(e);
-            var delta = e.deltaY || -e.wheelDelta;
+            var delta = e.deltaY;
             if (e.type === 'keydown' && path[0] === document.body) {
                 var dialog = this.$refs.dialog;
                 var selected = window.getSelection().anchorNode;

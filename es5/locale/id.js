@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: 'Baris setiap halaman:'
     },
-    noDataText: 'Tidak ada data tersedia'
+    noDataText: 'Tidak ada data tersedia',
+    carousel: {
+        prev: 'Visual sebelumnya',
+        next: 'Visual selanjutnya'
+    }
 };
 //# sourceMappingURL=id.js.map

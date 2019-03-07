@@ -15,6 +15,10 @@ exports.default = {
     dataTable: {
         rowsPerPageText: '1ページあたりの行数：'
     },
-    noDataText: 'データはありません。'
+    noDataText: 'データはありません。',
+    carousel: {
+        prev: '前のビジュアル',
+        next: '次のビジュアル'
+    }
 };
 //# sourceMappingURL=ja.js.map

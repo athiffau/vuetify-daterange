@@ -35,6 +35,10 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
             type: String,
             default: 'ease'
         },
+        autoLineWidth: {
+            type: Boolean,
+            default: false
+        },
         color: {
             type: String,
             default: 'primary'
@@ -95,6 +99,10 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
         width: {
             type: [Number, String],
             default: 300
+        },
+        labelSize: {
+            type: [Number, String],
+            default: 7
         }
     },
     data: function data() {
@@ -103,15 +111,30 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
         };
     },
     computed: {
+        parsedPadding: function parsedPadding() {
+            return Number(this.padding);
+        },
+        parsedWidth: function parsedWidth() {
+            return Number(this.width);
+        },
+        totalBars: function totalBars() {
+            return this.value.length;
+        },
+        _lineWidth: function _lineWidth() {
+            if (this.autoLineWidth && this.type !== 'trend') {
+                var totalPadding = this.parsedPadding * (this.totalBars + 1);
+                return (this.parsedWidth - totalPadding) / this.totalBars;
+            } else {
+                return Number(this.lineWidth) || 4;
+            }
+        },
         boundary: function boundary() {
-            var padding = Number(this.padding);
             var height = Number(this.height);
-            var width = Number(this.width);
             return {
-                minX: padding,
-                minY: padding,
-                maxX: width - padding,
-                maxY: height - padding
+                minX: this.parsedPadding,
+                minY: this.parsedPadding,
+                maxX: this.parsedWidth - this.parsedPadding,
+                maxY: height - this.parsedPadding
             };
         },
         hasLabels: function hasLabels() {
@@ -134,7 +157,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
             return labels;
         },
         points: function points() {
-            return (0, _core.genPoints)(this.value.slice(), this.boundary);
+            return (0, _core.genPoints)(this.value.slice(), this.boundary, this.type);
         },
         textY: function textY() {
             return this.boundary.maxY + 6;
@@ -234,33 +257,36 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
             }, [children]);
         },
         genBar: function genBar() {
-            if (!this.value || this.value.length < 2) return undefined;
+            if (!this.value || this.totalBars < 2) return undefined;
             var width = this.width,
                 height = this.height,
-                padding = this.padding,
-                lineWidth = this.lineWidth;
+                parsedPadding = this.parsedPadding,
+                _lineWidth = this._lineWidth;
 
-            var viewWidth = width || this.value.length * Number(padding) * 2;
+            var viewWidth = width || this.totalBars * parsedPadding * 2;
             var viewHeight = height || 75;
             var boundary = {
-                minX: Number(padding),
-                minY: Number(padding),
-                maxX: Number(viewWidth) - Number(padding),
-                maxY: Number(viewHeight) - Number(padding)
+                minX: parsedPadding,
+                minY: parsedPadding,
+                maxX: Number(viewWidth) - parsedPadding,
+                maxY: Number(viewHeight) - parsedPadding
             };
             var props = _extends({}, this.$props);
-            props.points = (0, _core.genPoints)(this.value, boundary);
+            props.points = (0, _core.genPoints)(this.value, boundary, this.type);
             var totalWidth = boundary.maxX / (props.points.length - 1);
             props.boundary = boundary;
-            props.lineWidth = lineWidth || totalWidth - Number(padding || 5);
-            props.offsetX = (totalWidth - props.lineWidth) / 2;
+            props.lineWidth = _lineWidth || totalWidth - Number(parsedPadding || 5);
+            props.offsetX = 0;
+            if (!this.autoLineWidth) {
+                props.offsetX = boundary.maxX / this.totalBars / 2 - boundary.minX;
+            }
             return this.$createElement('svg', {
                 attrs: {
                     width: '100%',
                     height: '25%',
                     viewBox: '0 0 ' + viewWidth + ' ' + viewHeight
                 }
-            }, [this.genGradient(), this.genClipPath(props.offsetX, 'sparkline-bar-' + this._uid), this.showLabels ? this.genBarLabels(props) : undefined, this.$createElement('g', {
+            }, [this.genGradient(), this.genClipPath(props.offsetX, props.lineWidth, 'sparkline-bar-' + this._uid), this.hasLabels ? this.genBarLabels(props) : undefined, this.$createElement('g', {
                 attrs: {
                     transform: 'scale(1,-1) translate(0,-' + boundary.maxY + ')',
                     'clip-path': 'url(#sparkline-bar-' + this._uid + '-clip)',
@@ -275,7 +301,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
                 }
             })])]);
         },
-        genClipPath: function genClipPath(offsetX, id) {
+        genClipPath: function genClipPath(offsetX, lineWidth, id) {
             var _this3 = this;
 
             var maxY = this.boundary.maxY;
@@ -288,9 +314,9 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
             }, this.points.map(function (item) {
                 return _this3.$createElement('rect', {
                     attrs: {
-                        x: item.x - offsetX,
+                        x: item.x + offsetX,
                         y: 0,
-                        width: _this3.lineWidth,
+                        width: lineWidth,
                         height: Math.max(maxY - item.y, 0),
                         rx: rounding,
                         ry: rounding
@@ -309,12 +335,13 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
         genBarLabels: function genBarLabels(props) {
             var _this4 = this;
 
-            var offsetX = (props.offsetX || 0) / 2;
+            var offsetX = props.offsetX || 0;
             var children = props.points.map(function (item) {
                 return _this4.$createElement('text', {
                     attrs: {
-                        x: item.x - offsetX * -0.45 - 10,
-                        y: props.boundary.maxY + 10
+                        x: item.x + offsetX + _this4._lineWidth / 2,
+                        y: props.boundary.maxY + (Number(_this4.labelSize) || 7),
+                        'font-size': Number(_this4.labelSize) || 7
                     }
                 }, item.value.toString());
             });
@@ -323,7 +350,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
         genTrend: function genTrend() {
             return this.$createElement('svg', this.setTextColor(this.color, {
                 attrs: {
-                    'stroke-width': this.lineWidth || 1,
+                    'stroke-width': this._lineWidth || 1,
                     width: '100%',
                     height: '25%',
                     viewBox: '0 0 ' + this.width + ' ' + this.height
@@ -332,7 +359,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default).extend({
         }
     },
     render: function render(h) {
-        if (this.value.length < 2) return undefined;
+        if (this.totalBars < 2) return undefined;
         return this.type === 'trend' ? this.genTrend() : this.genBar();
     }
 });
