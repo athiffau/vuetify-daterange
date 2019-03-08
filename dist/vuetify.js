@@ -6064,9 +6064,9 @@ var __assign = undefined && undefined.__assign || function () {
             var isAllowed = Object(_util_isDateAllowed__WEBPACK_IMPORTED_MODULE_4__["default"])(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
-            var inView = mouseEventType === 'month' && formatter(this.viewing) === formatter(value);
             var isHover = value === this.hovering;
             var isRange = this.range && this.value.length > 0;
+            var inView = isRange ? mouseEventType === 'month' && formatter(this.viewing) === formatter(value) : false;
             var isInRange = Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["default"])(value, this.value);
             var isRangeEnd = isRange && (value === this.value[1] || !isInRange && (value === this.value[0] && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverBeforeStartDate"])(this.value[0], this.hoverLink) || value === this.hovering && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverAfterStartDate"])(this.value[0], this.hoverLink)));
             var isRangeStart = isRange && !isRangeEnd && (value === this.value[0] || value === this.hovering && Object(_util_isDateInRange__WEBPACK_IMPORTED_MODULE_5__["isHoverBeforeStartDate"])(this.value[0], this.hoverLink));

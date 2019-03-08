@@ -9,7 +9,7 @@ import Themeable from '../../../mixins/themeable'
 
 // Utils
 import isDateAllowed, { AllowedDateFunction } from '../util/isDateAllowed'
-import isDateInRange, { isHoverAfterStartDate } from '../util/isDateInRange'
+import isDateInRange, { isDateInHoverRange, isHoverAfterStartDate, isHoverBeforeStartDate } from '../util/isDateInRange'
 import mixins from '../../../util/mixins'
 
 // Types
@@ -41,10 +41,6 @@ export default mixins(
       type: [Array, Function, Object, String],
       default: () => 'warning'
     } as any as PropValidator<DateEventColors>,
-    hover: {
-      type: String,
-      default: ''
-    },
     hoverLink: {
       type: String,
       default: ''
@@ -62,7 +58,8 @@ export default mixins(
       type: String,
       required: true
     },
-    value: [String, Array]
+    value: [String, Array],
+    viewing: String
   },
 
   data: () => ({
@@ -139,18 +136,27 @@ export default mixins(
       const isSelected = value === this.value || (Array.isArray(this.value) && this.value.indexOf(value) !== -1)
       const isCurrent = value === this.current
       const isHover = value === this.hovering
-      const isRange = this.range
-      const isRangeStart = isRange && value === this.value[0]
-      const isRangeEnd = isRange && value === this.value[1]
-      const setColor = isSelected || isRange ? this.setBackgroundColor : this.setTextColor
+      const isRange = this.range && this.value.length > 0
+      const inView = isRange ? mouseEventType === 'month' && formatter(this.viewing) === formatter(value) : false
+      const isInRange = isDateInRange(value, this.value)
+      const isRangeEnd = (isRange && (
+        value === this.value[1] ||
+        (!isInRange && (
+          (value === this.value[0] && isHoverBeforeStartDate(this.value[0], this.hoverLink)) ||
+          (value === this.hovering && isHoverAfterStartDate(this.value[0], this.hoverLink))
+        ))
+      ))
+      const isRangeStart = isRange && !isRangeEnd && (
+        value === this.value[0] ||
+        (value === this.hovering && isHoverBeforeStartDate(this.value[0], this.hoverLink))
+      )
+      const setColor = isSelected || isRange || inView ? this.setBackgroundColor : this.setTextColor
 
-      //  AT -> Added support for date-range
-      //  const color = (isSelected || isCurrent) && (this.color || 'accent')
-      const color = this.getFinalColor(value, (isSelected || isCurrent) && (this.color || 'accent'))
+      const color = this.getFinalColor(value, (isSelected || isCurrent || inView) && (this.color || 'accent'))
 
       return this.$createElement('button', setColor(color, {
         staticClass: 'v-btn',
-        'class': this.genButtonClasses(isAllowed, isFloating, isSelected, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
+        'class': this.genButtonClasses(isAllowed, isFloating, isSelected || inView, isCurrent, isRange, isHover, isRangeStart, isRangeEnd),
         attrs: {
           type: 'button'
         },
@@ -170,9 +176,9 @@ export default mixins(
     },
     getFinalColor (date: string, color: string | false) {
       const colorInRange = Array.isArray(this.value) && isDateInRange(date, this.value)
-      const colorInRangeHover = Array.isArray(this.value) && (this.value.length === 1) && (typeof this.value[0] === 'string') && isHoverAfterStartDate(date, this.value[0], this.hover ? this.hover : this.hoverLink)
+      const colorInRangeHover = Array.isArray(this.value) && (this.value.length === 1) && (typeof this.value[0] === 'string') && isDateInHoverRange(date, this.value[0], this.hoverLink)
       const colorRangeNode = Array.isArray(this.value) && (this.value.indexOf(date) === 0 || date === this.value[this.value.length - 1])
-      return colorRangeNode ? 'accent darken-4' : colorInRange ? 'accent darken-2' : colorInRangeHover ? 'accent darken-3' : color
+      return colorRangeNode ? `${this.color} accent darken-4` : colorInRange ? `${this.color} accent darken-2` : colorInRangeHover ? `${this.color} accent darken-3` : color
     },
     getEventColors (date: string) {
       const arrayize = (v: string | string[]) => Array.isArray(v) ? v : [v]

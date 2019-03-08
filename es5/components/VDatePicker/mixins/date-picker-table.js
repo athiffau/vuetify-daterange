@@ -146,9 +146,9 @@ exports.default = (0, _mixins2.default)(_colorable2.default, _themeable2.default
             var isAllowed = (0, _isDateAllowed2.default)(value, this.min, this.max, this.allowedDates);
             var isSelected = value === this.value || Array.isArray(this.value) && this.value.indexOf(value) !== -1;
             var isCurrent = value === this.current;
-            var inView = mouseEventType === 'month' && formatter(this.viewing) === formatter(value);
             var isHover = value === this.hovering;
             var isRange = this.range && this.value.length > 0;
+            var inView = isRange ? mouseEventType === 'month' && formatter(this.viewing) === formatter(value) : false;
             var isInRange = (0, _isDateInRange2.default)(value, this.value);
             var isRangeEnd = isRange && (value === this.value[1] || !isInRange && (value === this.value[0] && (0, _isDateInRange.isHoverBeforeStartDate)(this.value[0], this.hoverLink) || value === this.hovering && (0, _isDateInRange.isHoverAfterStartDate)(this.value[0], this.hoverLink)));
             var isRangeStart = isRange && !isRangeEnd && (value === this.value[0] || value === this.hovering && (0, _isDateInRange.isHoverBeforeStartDate)(this.value[0], this.hoverLink));
