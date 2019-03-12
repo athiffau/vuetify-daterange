@@ -32,7 +32,7 @@ var Vuetify = {
         }, args));
     },
 
-    version: '1.5.5'
+    version: '1.5.6'
 };
 if (typeof window !== 'undefined' && window.Vue) {
     window.Vue.use(Vuetify);

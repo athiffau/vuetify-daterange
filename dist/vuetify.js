@@ -4832,7 +4832,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./util */ "./src/components/VDatePicker/util/index.ts");
 /* harmony import */ var _util_isDateAllowed__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./util/isDateAllowed */ "./src/components/VDatePicker/util/isDateAllowed.ts");
 /* harmony import */ var _util_console__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../util/console */ "./src/util/console.ts");
-/* harmony import */ var _util_mixins__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../util/mixins */ "./src/util/mixins.ts");
+/* harmony import */ var _VCalendar_util_timestamp__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../VCalendar/util/timestamp */ "./src/components/VCalendar/util/timestamp.ts");
+/* harmony import */ var _util_mixins__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../util/mixins */ "./src/util/mixins.ts");
 var __read = undefined && undefined.__read || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -4868,6 +4869,7 @@ var __read = undefined && undefined.__read || function (o, n) {
 
 
 
+
 // Adds leading zero to month/day if necessary, returns 'YYYY' if type = 'year',
 // 'YYYY-MM' if 'month' and 'YYYY-MM-DD' if 'date'
 function sanitizeDateString(dateString, type) {
@@ -4879,7 +4881,7 @@ function sanitizeDateString(dateString, type) {
         date = _c === void 0 ? 1 : _c;
     return (year + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(month) + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(date)).substr(0, { date: 10, month: 7, year: 4 }[type]);
 }
-/* harmony default export */ __webpack_exports__["default"] = (Object(_util_mixins__WEBPACK_IMPORTED_MODULE_9__["default"])(_mixins_picker__WEBPACK_IMPORTED_MODULE_5__["default"]
+/* harmony default export */ __webpack_exports__["default"] = (Object(_util_mixins__WEBPACK_IMPORTED_MODULE_10__["default"])(_mixins_picker__WEBPACK_IMPORTED_MODULE_5__["default"]
 /* @vue/component */
 ).extend({
     name: 'v-date-picker',
@@ -5138,7 +5140,7 @@ function sanitizeDateString(dateString, type) {
             if (this.type === 'month') {
                 this.tableDate = "" + value;
             } else {
-                this.tableDate = value + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])(this.tableMonth + 1);
+                this.tableDate = value + "-" + Object(_util__WEBPACK_IMPORTED_MODULE_6__["pad"])((this.tableMonth || 0) + 1);
             }
             this.activePicker = 'MONTH';
             if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {
@@ -5149,6 +5151,9 @@ function sanitizeDateString(dateString, type) {
             this.inputYear = parseInt(value.split('-')[0], 10);
             this.inputMonth = parseInt(value.split('-')[1], 10) - 1;
             if (this.type === 'date') {
+                if (this.inputDay) {
+                    this.inputDay = Math.min(this.inputDay, Object(_VCalendar_util_timestamp__WEBPACK_IMPORTED_MODULE_9__["daysInMonth"])(this.inputYear, this.inputMonth + 1));
+                }
                 this.tableDate = value;
                 this.activePicker = 'DATE';
                 if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {
@@ -5841,12 +5846,15 @@ __webpack_require__.r(__webpack_exports__);
         }
     },
     mounted: function mounted() {
-        var activeItem = this.$el.getElementsByClassName('active')[0];
-        if (activeItem) {
-            this.$el.scrollTop = activeItem.offsetTop - this.$el.offsetHeight / 2 + activeItem.offsetHeight / 2;
-        } else {
-            this.$el.scrollTop = this.$el.scrollHeight / 2 - this.$el.offsetHeight / 2;
-        }
+        var _this = this;
+        setTimeout(function () {
+            var activeItem = _this.$el.getElementsByClassName('active')[0];
+            if (activeItem) {
+                _this.$el.scrollTop = activeItem.offsetTop - _this.$el.offsetHeight / 2 + activeItem.offsetHeight / 2;
+            } else {
+                _this.$el.scrollTop = _this.$el.scrollHeight / 2 - _this.$el.offsetHeight / 2;
+            }
+        });
     },
     methods: {
         genYearItem: function genYearItem(year) {
@@ -17128,7 +17136,7 @@ var __assign = undefined && undefined.__assign || function () {
             var coords = { x: clientX - left, y: top - clientY };
             var handAngle = Math.round(this.angle(center, coords) - this.rotate + 360) % 360;
             var insideClick = this.double && this.euclidean(center, coords) < (innerWidth + innerWidth * this.innerRadiusScale) / 4;
-            var value = Math.round(handAngle / this.degreesPerUnit) + this.min + (insideClick ? this.roundCount : 0);
+            var value = (Math.round(handAngle / this.degreesPerUnit) + (insideClick ? this.roundCount : 0)) % this.count + this.min;
             // Necessary to fix edge case when selecting left part of the value(s) at 12 o'clock
             var newValue;
             if (handAngle >= 360 - this.degreesPerUnit / 2) {
@@ -19330,7 +19338,7 @@ var Vuetify = {
             return false;
         })(opts.components);
     },
-    version: '1.5.5'
+    version: '1.5.6'
 };
 function checkVueVersion(Vue, requiredVue) {
     var vueDep = requiredVue || '^2.5.18';
@@ -20787,7 +20795,7 @@ function isRippleEnabled(value) {
 function rippleShow(e) {
     var value = {};
     var element = e.currentTarget;
-    if (!element || element._ripple.touched) return;
+    if (!element || !element._ripple || element._ripple.touched) return;
     if (isTouchEvent(e)) {
         element._ripple.touched = true;
     }
@@ -21055,7 +21063,7 @@ var Vuetify = {
         Vue.use(_components_Vuetify__WEBPACK_IMPORTED_MODULE_1__["default"], __assign({ components: _components__WEBPACK_IMPORTED_MODULE_2__,
             directives: _directives__WEBPACK_IMPORTED_MODULE_3__["default"] }, args));
     },
-    version: '1.5.5'
+    version: '1.5.6'
 };
 if (typeof window !== 'undefined' && window.Vue) {
     window.Vue.use(Vuetify);

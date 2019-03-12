@@ -43,6 +43,8 @@ var _isDateAllowed3 = _interopRequireDefault(_isDateAllowed2);
 
 var _console = require('../../util/console');
 
+var _timestamp = require('../VCalendar/util/timestamp');
+
 var _mixins = require('../../util/mixins');
 
 var _mixins2 = _interopRequireDefault(_mixins);
@@ -325,7 +327,7 @@ exports.default = (0, _mixins2.default)(_picker2.default
             if (this.type === 'month') {
                 this.tableDate = '' + value;
             } else {
-                this.tableDate = value + '-' + (0, _util.pad)(this.tableMonth + 1);
+                this.tableDate = value + '-' + (0, _util.pad)((this.tableMonth || 0) + 1);
             }
             this.activePicker = 'MONTH';
             if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {
@@ -336,6 +338,9 @@ exports.default = (0, _mixins2.default)(_picker2.default
             this.inputYear = parseInt(value.split('-')[0], 10);
             this.inputMonth = parseInt(value.split('-')[1], 10) - 1;
             if (this.type === 'date') {
+                if (this.inputDay) {
+                    this.inputDay = Math.min(this.inputDay, (0, _timestamp.daysInMonth)(this.inputYear, this.inputMonth + 1));
+                }
                 this.tableDate = value;
                 this.activePicker = 'DATE';
                 if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {

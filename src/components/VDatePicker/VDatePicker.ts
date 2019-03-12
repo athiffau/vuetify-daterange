@@ -12,6 +12,7 @@ import Picker from '../../mixins/picker'
 import { pad, createNativeLocaleFormatter } from './util'
 import isDateAllowed, { AllowedDateFunction } from './util/isDateAllowed'
 import { consoleWarn } from '../../util/console'
+import { daysInMonth } from '../VCalendar/util/timestamp'
 import mixins from '../../util/mixins'
 
 // Types
@@ -67,6 +68,10 @@ export default mixins(
     },
     // Function formatting the tableDate in the day/month table header
     headerDateFormat: Function as PropValidator<DatePickerFormatter | undefined>,
+    hideDisabled: {
+      type: Boolean,
+      default: false
+    },
     hoverLink: String,
     locale: {
       type: String,
@@ -216,6 +221,9 @@ export default mixins(
     }
   },
   watch: {
+    activePicker (val: string) {
+      this.$emit('pickerType', val)
+    },
     tableDate (val: string, prev: string) {
       // Make a ISO 8601 strings from val and prev for comparision, otherwise it will incorrectly
       // compare for example '2000-9' and '2000-10'
@@ -226,8 +234,8 @@ export default mixins(
     pickerDate (val: string | null) {
       if (val) {
         this.tableDate = val
+        this.setInputDate()
       } else if (this.lastValue && this.type === 'date') {
-        console.log(`Replace date with ${this.lastValue}`)
         this.tableDate = sanitizeDateString(this.lastValue, 'month')
       } else if (this.lastValue && this.type === 'month') {
         this.tableDate = sanitizeDateString(this.lastValue, 'year')
@@ -297,7 +305,7 @@ export default mixins(
       if (this.type === 'month') {
         this.tableDate = `${value}`
       } else {
-        this.tableDate = `${value}-${pad(this.tableMonth + 1)}`
+        this.tableDate = `${value}-${pad((this.tableMonth || 0) + 1)}`
       }
       this.activePicker = 'MONTH'
       if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {
@@ -308,6 +316,10 @@ export default mixins(
       this.inputYear = parseInt(value.split('-')[0], 10)
       this.inputMonth = parseInt(value.split('-')[1], 10) - 1
       if (this.type === 'date') {
+        if (this.inputDay) {
+          this.inputDay = Math.min(this.inputDay, daysInMonth(this.inputYear, this.inputMonth + 1))
+        }
+
         this.tableDate = value
         this.activePicker = 'DATE'
         if (this.reactive && !this.readonly && !this.multiple && this.isDateAllowed(this.inputDate)) {
@@ -326,6 +338,7 @@ export default mixins(
     genPickerTitle () {
       return this.$createElement(VDatePickerTitle, {
         props: {
+          allowDateChange: this.allowDateChange,
           date: this.value ? (this.formatters.titleDate as (value: any) => string)(this.value) : '',
           disabled: this.disabled,
           readonly: this.readonly,
@@ -349,6 +362,7 @@ export default mixins(
           dark: this.dark,
           disabled: this.disabled,
           format: this.headerDateFormat,
+          hideDisabled: this.hideDisabled,
           light: this.light,
           locale: this.locale,
           min: this.activePicker === 'DATE' ? this.minMonth : this.minYear,
@@ -375,7 +389,6 @@ export default mixins(
           eventColor: this.eventColor,
           firstDayOfWeek: this.firstDayOfWeek,
           format: this.dayFormat,
-          hover: this.hovering,
           hoverLink: this.hoverLink,
           light: this.light,
           locale: this.locale,
@@ -418,6 +431,7 @@ export default mixins(
           readonly: this.readonly && this.type === 'month',
           scrollable: this.scrollable,
           value: this.selectedMonths,
+          viewing: `${pad(this.tableYear, 4)}-${pad(this.tableMonth + 1)}`,
           tableDate: `${pad(this.tableYear, 4)}`
         },
         ref: 'table',
@@ -457,6 +471,8 @@ export default mixins(
       }, children)
     },
     setInputDate () {
+      const picker = this.pickerDate ? this.pickerDate.split('-') : null
+
       if (this.lastValue) {
         const array = this.lastValue.split('-')
         this.inputYear = parseInt(array[0], 10)
@@ -464,6 +480,9 @@ export default mixins(
         if (this.type === 'date') {
           this.inputDay = parseInt(array[2], 10)
         }
+      } else if (picker && parseInt(picker[0], 10) !== this.inputYear) {
+        this.inputYear = parseInt(picker[0], 10)
+        this.inputMonth = parseInt(picker[1], 10) - 1
       } else {
         this.inputYear = this.inputYear || this.now.getFullYear()
         this.inputMonth = this.inputMonth == null ? this.inputMonth : this.now.getMonth()

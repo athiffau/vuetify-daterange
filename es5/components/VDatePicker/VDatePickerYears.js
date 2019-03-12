@@ -46,17 +46,21 @@ exports.default = (0, _mixins2.default)(_colorable2.default
         }
     },
     mounted: function mounted() {
-        var activeItem = this.$el.getElementsByClassName('active')[0];
-        if (activeItem) {
-            this.$el.scrollTop = activeItem.offsetTop - this.$el.offsetHeight / 2 + activeItem.offsetHeight / 2;
-        } else {
-            this.$el.scrollTop = this.$el.scrollHeight / 2 - this.$el.offsetHeight / 2;
-        }
+        var _this = this;
+
+        setTimeout(function () {
+            var activeItem = _this.$el.getElementsByClassName('active')[0];
+            if (activeItem) {
+                _this.$el.scrollTop = activeItem.offsetTop - _this.$el.offsetHeight / 2 + activeItem.offsetHeight / 2;
+            } else {
+                _this.$el.scrollTop = _this.$el.scrollHeight / 2 - _this.$el.offsetHeight / 2;
+            }
+        });
     },
 
     methods: {
         genYearItem: function genYearItem(year) {
-            var _this = this;
+            var _this2 = this;
 
             var formatted = this.formatter('' + year);
             var active = parseInt(this.value, 10) === year;
@@ -66,7 +70,7 @@ exports.default = (0, _mixins2.default)(_colorable2.default
                 'class': { active: active },
                 on: {
                     click: function click() {
-                        return _this.$emit('input', year);
+                        return _this2.$emit('input', year);
                     }
                 }
             }), formatted);
