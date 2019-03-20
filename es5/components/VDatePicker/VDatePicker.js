@@ -118,7 +118,10 @@ exports.default = (0, _mixins2.default)(_picker2.default
             type: String,
             default: '$vuetify.icons.prev'
         },
-        range: Boolean,
+        range: {
+            type: Boolean,
+            default: false
+        },
         reactive: Boolean,
         readonly: Boolean,
         scrollable: Boolean,

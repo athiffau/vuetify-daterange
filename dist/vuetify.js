@@ -4935,7 +4935,10 @@ function sanitizeDateString(dateString, type) {
             type: String,
             default: '$vuetify.icons.prev'
         },
-        range: Boolean,
+        range: {
+            type: Boolean,
+            default: false
+        },
         reactive: Boolean,
         readonly: Boolean,
         scrollable: Boolean,
@@ -16169,7 +16172,7 @@ var dirtyTypes = ['color', 'file', 'time', 'date', 'datetime-local', 'week', 'mo
                 return this.lazyValue;
             },
             set: function set(val) {
-                if (this.mask) {
+                if (this.mask && val !== this.lazyValue) {
                     this.lazyValue = this.unmaskText(this.maskText(this.unmaskText(val)));
                     this.setSelectionRange();
                 } else {
@@ -19338,7 +19341,7 @@ var Vuetify = {
             return false;
         })(opts.components);
     },
-    version: '1.5.6'
+    version: '1.5.7'
 };
 function checkVueVersion(Vue, requiredVue) {
     var vueDep = requiredVue || '^2.5.18';
@@ -21063,7 +21066,7 @@ var Vuetify = {
         Vue.use(_components_Vuetify__WEBPACK_IMPORTED_MODULE_1__["default"], __assign({ components: _components__WEBPACK_IMPORTED_MODULE_2__,
             directives: _directives__WEBPACK_IMPORTED_MODULE_3__["default"] }, args));
     },
-    version: '1.5.6'
+    version: '1.5.7'
 };
 if (typeof window !== 'undefined' && window.Vue) {
     window.Vue.use(Vuetify);

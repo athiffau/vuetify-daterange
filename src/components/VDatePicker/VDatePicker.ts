@@ -91,7 +91,10 @@ export default mixins(
       type: String,
       default: '$vuetify.icons.prev'
     },
-    range: Boolean,
+    range: {
+      type: Boolean,
+      default: false
+    },
     reactive: Boolean,
     readonly: Boolean,
     scrollable: Boolean,
