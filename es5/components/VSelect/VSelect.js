@@ -541,6 +541,8 @@ exports.default = _VTextField2.default.extend({
             // open `v-menu`
             if (this.selectedItems.length === 0) {
                 this.isMenuActive = true;
+            } else {
+                this.isMenuActive = false;
             }
             this.selectedIndex = -1;
         },
@@ -573,11 +575,15 @@ exports.default = _VTextField2.default.extend({
             }
             this.keyboardLookupPrefix += e.key.toLowerCase();
             this.keyboardLookupLastTime = now;
-            var item = this.allItems.find(function (item) {
+            var index = this.allItems.findIndex(function (item) {
                 return _this7.getText(item).toLowerCase().startsWith(_this7.keyboardLookupPrefix);
             });
-            if (item !== undefined) {
+            var item = this.allItems[index];
+            if (index !== -1) {
                 this.setValue(this.returnObject ? item : this.getValue(item));
+                setTimeout(function () {
+                    return _this7.setMenuIndex(index);
+                });
             }
         },
         onKeyDown: function onKeyDown(e) {

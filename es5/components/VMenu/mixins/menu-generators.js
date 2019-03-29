@@ -57,7 +57,7 @@ exports.default = {
             var directives = !this.openOnHover && this.closeOnClick ? [{
                 name: 'click-outside',
                 value: function value() {
-                    return _this.isActive = false;
+                    _this.isActive = false;
                 },
                 args: {
                     closeConditional: this.closeConditional,
@@ -80,6 +80,7 @@ exports.default = {
                 staticClass: 'v-menu__content',
                 'class': _extends({}, this.rootThemeClasses, _defineProperty({
                     'v-menu__content--auto': this.auto,
+                    'v-menu__content--fixed': this.activatorFixed,
                     'menuable__content__active': this.isActive
                 }, this.contentClass.trim(), true)),
                 style: this.styles,
@@ -90,7 +91,8 @@ exports.default = {
                         e.stopPropagation();
                         if (e.target.getAttribute('disabled')) return;
                         if (_this2.closeOnContentClick) _this2.isActive = false;
-                    }
+                    },
+                    keydown: this.onKeyDown
                 }
             };
             !this.disabled && this.openOnHover && (options.on.mouseenter = this.mouseEnterHandler);

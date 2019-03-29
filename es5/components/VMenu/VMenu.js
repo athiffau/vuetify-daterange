@@ -207,8 +207,8 @@ exports.default = _vue2.default.extend({
                 });
             });
         },
-        closeConditional: function closeConditional() {
-            return this.isActive && this.closeOnClick;
+        closeConditional: function closeConditional(e) {
+            return this.isActive && this.closeOnClick && !this.$refs.content.contains(e.target);
         },
         onResize: function onResize() {
             if (!this.isActive) return;

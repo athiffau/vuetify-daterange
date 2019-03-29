@@ -169,7 +169,7 @@ exports.default = {
             // If the dialog content contains
             // the click event, or if the
             // dialog is not active
-            if (this.$refs.content.contains(e.target) || !this.isActive) return false;
+            if (!this.isActive || this.$refs.content.contains(e.target)) return false;
             // If we made it here, the click is outside
             // and is active. If persistent, and the
             // click is on the overlay, animate
@@ -179,7 +179,7 @@ exports.default = {
             }
             // close dialog if !persistent, clicked outside and we're the topmost dialog.
             // Since this should only be called in a capture event (bottom up), we shouldn't need to stop propagation
-            return (0, _helpers.getZIndex)(this.$refs.content) >= this.getMaxZIndex();
+            return this.activeZIndex >= this.getMaxZIndex();
         },
         hideScroll: function hideScroll() {
             if (this.fullscreen) {
@@ -191,16 +191,64 @@ exports.default = {
         show: function show() {
             !this.fullscreen && !this.hideOverlay && this.genOverlay();
             this.$refs.content.focus();
-            this.$listeners.keydown && this.bind();
+            this.bind();
         },
         bind: function bind() {
-            window.addEventListener('keydown', this.onKeydown);
+            window.addEventListener('focusin', this.onFocusin);
         },
         unbind: function unbind() {
-            window.removeEventListener('keydown', this.onKeydown);
+            window.removeEventListener('focusin', this.onFocusin);
         },
         onKeydown: function onKeydown(e) {
+            if (e.keyCode === _helpers.keyCodes.esc && !this.getOpenDependents().length) {
+                if (!this.persistent) {
+                    this.isActive = false;
+                    var activator = this.getActivator();
+                    this.$nextTick(function () {
+                        return activator && activator.focus();
+                    });
+                } else if (!this.noClickAnimation) {
+                    this.animateClick();
+                }
+            }
             this.$emit('keydown', e);
+        },
+        onFocusin: function onFocusin(e) {
+            var _event = event,
+                target = _event.target;
+
+            if (
+            // It isn't the document or the dialog body
+            ![document, this.$refs.content].includes(target) &&
+            // It isn't inside the dialog body
+            !this.$refs.content.contains(target) &&
+            // We're the topmost dialog
+            this.activeZIndex >= this.getMaxZIndex() &&
+            // It isn't inside a dependent element (like a menu)
+            !this.getOpenDependentElements().some(function (el) {
+                return el.contains(target);
+            })
+            // So we must have focused something outside the dialog and its children
+            ) {
+                    // Find and focus the first available element inside the dialog
+                    var focusable = this.$refs.content.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    focusable.length && focusable[0].focus();
+                }
+        },
+        getActivator: function getActivator(e) {
+            if (this.$refs.activator) {
+                return this.$refs.activator.children.length > 0 ? this.$refs.activator.children[0] : this.$refs.activator;
+            }
+            if (e) {
+                this.activatedBy = e.currentTarget || e.target;
+            }
+            if (this.activatedBy) return this.activatedBy;
+            if (this.activatorNode) {
+                var activator = Array.isArray(this.activatorNode) ? this.activatorNode[0] : this.activatorNode;
+                var el = activator && activator.elm;
+                if (el) return el;
+            }
+            (0, _console.consoleError)('No activator found');
         },
         genActivator: function genActivator() {
             var _this3 = this;
@@ -209,6 +257,7 @@ exports.default = {
             var listeners = this.disabled ? {} : {
                 click: function click(e) {
                     e.stopPropagation();
+                    _this3.getActivator(e);
                     if (!_this3.disabled) _this3.isActive = !_this3.isActive;
                 }
             };
@@ -219,9 +268,10 @@ exports.default = {
             }
             return this.$createElement('div', {
                 staticClass: 'v-dialog__activator',
-                'class': {
+                class: {
                     'v-dialog__activator--disabled': this.disabled
                 },
+                ref: 'activator',
                 on: listeners
             }, this.$slots.activator);
         }
@@ -236,7 +286,7 @@ exports.default = {
             directives: [{
                 name: 'click-outside',
                 value: function value() {
-                    return _this4.isActive = false;
+                    _this4.isActive = false;
                 },
                 args: {
                     closeConditional: this.closeConditional,
@@ -270,6 +320,9 @@ exports.default = {
             attrs: _extends({
                 tabIndex: '-1'
             }, this.getScopeIdAttrs()),
+            on: {
+                keydown: this.onKeydown
+            },
             style: { zIndex: this.activeZIndex },
             ref: 'content'
         }, [this.$createElement(_ThemeProvider2.default, {

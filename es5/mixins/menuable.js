@@ -18,8 +18,6 @@ var _stackable = require('./stackable');
 
 var _stackable2 = _interopRequireDefault(_stackable);
 
-var _console = require('../util/console');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint-disable object-property-newline */
@@ -107,6 +105,7 @@ exports.default = _vue2.default.extend({
         return {
             absoluteX: 0,
             absoluteY: 0,
+            activatorFixed: false,
             dimensions: Object.assign({}, dimensions),
             isContentActive: false,
             pageWidth: 0,
@@ -233,8 +232,20 @@ exports.default = _vue2.default.extend({
         },
         checkForPageYOffset: function checkForPageYOffset() {
             if (this.hasWindow) {
-                this.pageYOffset = this.getOffsetTop();
+                this.pageYOffset = this.activatorFixed ? 0 : this.getOffsetTop();
             }
+        },
+        checkActivatorFixed: function checkActivatorFixed() {
+            if (this.attach !== false) return;
+            var el = this.getActivator();
+            while (el) {
+                if (window.getComputedStyle(el).position === 'fixed') {
+                    this.activatorFixed = true;
+                    return;
+                }
+                el = el.offsetParent;
+            }
+            this.activatorFixed = false;
         },
         deactivate: function deactivate() {},
         getActivator: function getActivator(e) {
@@ -257,7 +268,6 @@ exports.default = _vue2.default.extend({
                 var el = activator && activator.elm;
                 if (el) return el;
             }
-            (0, _console.consoleError)('No activator found');
         },
         getInnerHeight: function getInnerHeight() {
             if (!this.hasWindow) return 0;
@@ -321,6 +331,7 @@ exports.default = _vue2.default.extend({
             var _this3 = this;
 
             this.checkForWindow();
+            this.checkActivatorFixed();
             this.checkForPageYOffset();
             this.pageWidth = document.documentElement.clientWidth;
             var dimensions = {};

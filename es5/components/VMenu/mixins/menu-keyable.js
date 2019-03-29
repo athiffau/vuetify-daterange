@@ -35,7 +35,14 @@ exports.default = {
             var _this = this;
 
             if (e.keyCode === _helpers.keyCodes.esc) {
-                this.isActive = false;
+                // Wait for dependent elements to close first
+                setTimeout(function () {
+                    _this.isActive = false;
+                });
+                var activator = this.getActivator();
+                this.$nextTick(function () {
+                    return activator && activator.focus();
+                });
             } else if (e.keyCode === _helpers.keyCodes.tab) {
                 setTimeout(function () {
                     if (!_this.$refs.content.contains(document.activeElement)) {
